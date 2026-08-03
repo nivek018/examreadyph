@@ -14,18 +14,14 @@ class ExamSetupController extends Controller
     public function __construct(protected AdPopupService $adService) {}
 
     /**
-     * Mode selection page.
+     * Mode selection page redirect to subject page.
      * URL: GET /exam/{exam:slug}/setup
      */
     public function setup(Exam $exam)
     {
         if (!$exam->is_active) abort(404);
 
-        $exam->loadCount(['questions' => fn($q) => $q->where('is_active', true)]);
-
-        return view('exam.setup', [
-            'exam' => $exam,
-        ]);
+        return redirect()->route('reviewer.show', $exam);
     }
 
     /**

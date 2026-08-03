@@ -41,7 +41,7 @@
 
                 {{-- CTA Buttons --}}
                 <div class="flex flex-wrap justify-center gap-3">
-                    <a href="{{ route('exam.setup', $exam) }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-lg transition shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2">
+                    <a href="#modes" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3 rounded-lg transition shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2">
                         <i class="fa-solid fa-play"></i> Start Reviewing
                     </a>
                     <a href="#subtopics" class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold px-6 py-3 rounded-lg transition hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2">
@@ -53,7 +53,7 @@
     </section>
 
     {{-- 3 Exam Mode Cards --}}
-    <section class="py-14 border-b border-slate-200 dark:border-slate-800">
+    <section id="modes" class="py-14 border-b border-slate-200 dark:border-slate-800">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
                 <p class="section-eyebrow">Choose Your Review Mode</p>

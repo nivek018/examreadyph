@@ -4,11 +4,6 @@
 >
     <section class="py-16" x-data="practiceSetup()">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            {{-- Back Link --}}
-            <a href="{{ route('exam.setup', $exam) }}" class="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition mb-8">
-                <i class="fa-solid fa-arrow-left"></i> Back to Mode Selection
-            </a>
-
             <div class="text-center mb-10">
                 <div class="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl mb-4 mx-auto">
                     <i class="fa-solid fa-bullseye"></i>
@@ -78,12 +73,14 @@
                     <input type="hidden" name="question_count" :value="questionCount">
                 </div>
 
-                {{-- Submit --}}
-                <button type="submit" :disabled="selectedSubtopics.length === 0"
-                        class="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold px-6 py-4 rounded-lg transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i>
-                    Start Practice (<span x-text="questionCount"></span> questions from <span x-text="selectedSubtopics.length"></span> subtopics)
-                </button>
+                {{-- Sticky Submit Button --}}
+                <div class="sticky bottom-4 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl">
+                    <button type="submit" :disabled="selectedSubtopics.length === 0"
+                            class="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold px-6 py-3.5 rounded-lg transition shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i>
+                        Start Practice (<span x-text="questionCount"></span> questions from <span x-text="selectedSubtopics.length"></span> subtopics)
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -148,7 +145,9 @@
     <script>
         function practiceSetup() {
             return {
-                selectedSubtopics: [],
+                selectedSubtopics: [
+                    @foreach($subtopics as $st){{ $st->id }},@endforeach
+                ],
                 questionCount: 10,
                 customCount: 15,
                 showAuthModal: {{ session('showAuthModal') ? 'true' : 'false' }},
