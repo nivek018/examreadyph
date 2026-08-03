@@ -133,11 +133,18 @@ class ExamSessionController extends Controller
             ->get()
             ->keyBy('question_id');
 
-        // Shuffle options if exam config says so
-        $options = $question->options;
-        if ($session->exam->shuffle_options) {
-            $options = $options->shuffle();
+        // Shuffle options uniquely and deterministically per session and question
+        $optionsArray = $question->options->all();
+        $seed = crc32($session->uuid . '-' . $question->id);
+        mt_srand($seed);
+        for ($i = count($optionsArray) - 1; $i > 0; $i--) {
+            $j = mt_rand(0, $i);
+            $tmp = $optionsArray[$i];
+            $optionsArray[$i] = $optionsArray[$j];
+            $optionsArray[$j] = $tmp;
         }
+        mt_srand(); // reset seed
+        $options = collect($optionsArray);
 
         $adConfig = $this->adService->getAdConfig(auth()->user(), 'exam');
 

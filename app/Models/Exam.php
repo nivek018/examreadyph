@@ -15,6 +15,11 @@ class Exam extends Model
         'show_explanations', 'allow_review', 'sections_json',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     protected function casts(): array
     {
         return [
