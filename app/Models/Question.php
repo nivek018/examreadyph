@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model
 {
     protected $fillable = [
-        'exam_id', 'section_name', 'question_text', 'explanation_taglish',
+        'exam_id', 'subtopic_id', 'section_name', 'question_text', 'explanation_taglish',
         'difficulty', 'is_premium', 'is_active', 'created_by', 'reported_count',
     ];
 
@@ -24,6 +24,11 @@ class Question extends Model
     public function exam(): BelongsTo
     {
         return $this->belongsTo(Exam::class);
+    }
+
+    public function subtopic(): BelongsTo
+    {
+        return $this->belongsTo(Subtopic::class);
     }
 
     public function options(): HasMany

@@ -19,7 +19,16 @@
             </div>
             <div>
                 <div class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-none">{{ $exam->name }}</div>
-                <div class="text-xs text-slate-500">{{ $exam->category->name ?? '' }}</div>
+                <div class="text-xs text-slate-500 flex items-center gap-2">
+                    {{ $exam->category->name ?? '' }}
+                    @if(($session->mode ?? 'mock') === 'relaxed')
+                        <span class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 text-[9px] font-bold uppercase">Relaxed</span>
+                    @elseif(($session->mode ?? 'mock') === 'practice')
+                        <span class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase">Practice</span>
+                    @else
+                        <span class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-[9px] font-bold uppercase">Mock</span>
+                    @endif
+                </div>
             </div>
         </div>
 

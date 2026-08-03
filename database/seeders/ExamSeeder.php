@@ -6,7 +6,9 @@ use App\Models\Exam;
 use App\Models\ExamCategory;
 use App\Models\Question;
 use App\Models\QuestionOption;
+use App\Models\Subtopic;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ExamSeeder extends Seeder
 {
@@ -49,8 +51,11 @@ class ExamSeeder extends Seeder
             'name' => 'CSE Professional Level',
             'slug' => 'cse-professional-level',
             'description' => 'Civil Service Exam - Professional Level. Covers Numerical, Analytical, Verbal, General Information, and PH Constitution.',
+            'seo_title' => 'CSE Professional Level Reviewer — Free Practice ' . date('Y') . ' | ExamReady PH',
+            'seo_description' => 'Free Civil Service Exam Professional Level reviewer with answer key and AI Taglish explanations. Practice 150+ questions covering Numerical Reasoning, Verbal Ability, Analytical Thinking, General Information, and PH Constitution.',
+            'long_description' => "The Civil Service Exam Professional Level (CSE-PPT) is one of the most popular government exams in the Philippines. It is administered by the Civil Service Commission (CSC) and is required for those who want to work in second-level government positions.\n\nThis free online reviewer covers all five major areas tested in the Professional Level exam:\n\n• Numerical Reasoning — Word problems, percentage, ratio, number series, and basic algebra.\n• Analytical Thinking — Logic puzzles, pattern recognition, and deductive reasoning.\n• Verbal Ability — Vocabulary, grammar, reading comprehension, and sentence completion.\n• General Information — Philippine history, current events, and general knowledge.\n• Philippine Constitution — Key provisions of the 1987 Philippine Constitution.\n\nOur reviewer features AI-powered Taglish explanations that break down each answer in a mix of English and Filipino, making it easier to understand the reasoning behind each correct answer.\n\nStudy Tips:\n1. Start with Numerical Reasoning — it has the most weight in the actual exam.\n2. Use Practice Mode to focus on your weakest subtopics.\n3. Take at least 3 full Mock Exams before your exam date.\n4. Review the PH Constitution — it's often the easiest to improve on.\n\nGood luck, future government employee! 🇵🇭",
             'total_questions' => 10,
-            'time_limit_seconds' => 1800, // 30 minutes for demo
+            'time_limit_seconds' => 1800,
             'passing_score_percent' => 80,
             'difficulty' => 'intermediate',
             'is_premium' => false,
@@ -66,6 +71,9 @@ class ExamSeeder extends Seeder
             'name' => 'UPCAT Reviewer',
             'slug' => 'upcat-reviewer',
             'description' => 'UP College Admission Test - covers Language Proficiency, Science, Math, and Reading Comprehension.',
+            'seo_title' => 'UPCAT Reviewer — Free Practice ' . date('Y') . ' | ExamReady PH',
+            'seo_description' => 'Free UPCAT reviewer with answer key. Practice Math, Science, Language Proficiency, and Reading Comprehension questions with instant AI Taglish explanations.',
+            'long_description' => "The University of the Philippines College Admission Test (UPCAT) is one of the most competitive college entrance exams in the Philippines. Thousands of students apply every year, but only a fraction get accepted.\n\nThis free online reviewer covers the four main areas tested in the UPCAT:\n\n• Mathematics — Algebra, geometry, trigonometry, statistics, and calculus basics.\n• Science — Biology, chemistry, physics, and earth science.\n• Language Proficiency — English grammar, Filipino vocabulary, and sentence construction.\n• Reading Comprehension — Analyzing passages and critical thinking.\n\nStudy Tips:\n1. Math and Science carry the most weight — prioritize these subjects.\n2. Practice time management — UPCAT is known for being time-pressured.\n3. Read widely — Reading Comprehension rewards students who are well-read.\n4. Don't guess blindly — the UPCAT has a minus system for wrong answers.\n\nStart practicing now and aim for that UP dream! 💚",
             'total_questions' => 10,
             'time_limit_seconds' => 1200,
             'passing_score_percent' => 70,
@@ -76,6 +84,67 @@ class ExamSeeder extends Seeder
             'show_explanations' => true,
             'allow_review' => true,
         ]);
+
+        // Create Subtopics for CSE Professional
+        $cseSubtopics = [
+            ['name' => 'Numerical Reasoning', 'icon' => 'fa-solid fa-calculator', 'sort_order' => 1, 'description' => 'Practice numerical reasoning questions including word problems, percentages, ratios, number series, and basic algebra. This is the highest-weighted section in the CSE Professional exam.'],
+            ['name' => 'Analytical Thinking', 'icon' => 'fa-solid fa-brain', 'sort_order' => 2, 'description' => 'Sharpen your logical reasoning skills with pattern recognition, deductive reasoning, and logic puzzle questions.'],
+            ['name' => 'Verbal Ability', 'icon' => 'fa-solid fa-spell-check', 'sort_order' => 3, 'description' => 'Improve your English language skills with vocabulary, grammar, reading comprehension, and sentence completion exercises.'],
+            ['name' => 'General Information', 'icon' => 'fa-solid fa-globe', 'sort_order' => 4, 'description' => 'Test your knowledge of Philippine history, geography, current events, and general knowledge topics.'],
+            ['name' => 'PH Constitution', 'icon' => 'fa-solid fa-landmark', 'sort_order' => 5, 'description' => 'Review key provisions of the 1987 Philippine Constitution including the Bill of Rights, powers of government, and citizenship.'],
+        ];
+
+        $cseSubtopicMap = [];
+        foreach ($cseSubtopics as $st) {
+            $subtopic = Subtopic::create([
+                'exam_id' => $csePro->id,
+                'name' => $st['name'],
+                'slug' => Str::slug($st['name']),
+                'icon' => $st['icon'],
+                'sort_order' => $st['sort_order'],
+                'description' => $st['description'],
+                'is_active' => true,
+            ]);
+            $cseSubtopicMap[$st['name']] = $subtopic->id;
+        }
+
+        // Create Subtopics for UPCAT
+        $upcatSubtopics = [
+            ['name' => 'Mathematics', 'icon' => 'fa-solid fa-square-root-variable', 'sort_order' => 1, 'description' => 'Practice algebra, geometry, trigonometry, statistics, and basic calculus problems commonly tested in the UPCAT.'],
+            ['name' => 'Science', 'icon' => 'fa-solid fa-flask', 'sort_order' => 2, 'description' => 'Review biology, chemistry, physics, and earth science concepts for the UPCAT Science subtest.'],
+            ['name' => 'Language Proficiency', 'icon' => 'fa-solid fa-language', 'sort_order' => 3, 'description' => 'Practice English grammar, Filipino vocabulary, and sentence construction exercises.'],
+            ['name' => 'Reading Comprehension', 'icon' => 'fa-solid fa-book-reader', 'sort_order' => 4, 'description' => 'Improve your ability to analyze passages, identify main ideas, and draw inferences.'],
+        ];
+
+        $upcatSubtopicMap = [];
+        foreach ($upcatSubtopics as $st) {
+            $subtopic = Subtopic::create([
+                'exam_id' => $upcat->id,
+                'name' => $st['name'],
+                'slug' => Str::slug($st['name']),
+                'icon' => $st['icon'],
+                'sort_order' => $st['sort_order'],
+                'description' => $st['description'],
+                'is_active' => true,
+            ]);
+            $upcatSubtopicMap[$st['name']] = $subtopic->id;
+        }
+
+        // Map section names to subtopic IDs
+        $cseSection2Subtopic = [
+            'PH Constitution' => $cseSubtopicMap['PH Constitution'],
+            'Numerical Reasoning' => $cseSubtopicMap['Numerical Reasoning'],
+            'Verbal Ability' => $cseSubtopicMap['Verbal Ability'],
+            'General Information' => $cseSubtopicMap['General Information'],
+            'Analytical Thinking' => $cseSubtopicMap['Analytical Thinking'],
+        ];
+
+        $upcatSection2Subtopic = [
+            'Mathematics' => $upcatSubtopicMap['Mathematics'],
+            'Science' => $upcatSubtopicMap['Science'],
+            'Language Proficiency' => $upcatSubtopicMap['Language Proficiency'],
+            'Reading Comprehension' => $upcatSubtopicMap['Reading Comprehension'],
+        ];
 
         // Seed Questions for CSE Professional
         $cseQuestions = [
@@ -154,6 +223,7 @@ class ExamSeeder extends Seeder
         foreach ($cseQuestions as $qData) {
             $question = Question::create([
                 'exam_id' => $csePro->id,
+                'subtopic_id' => $cseSection2Subtopic[$qData['section']] ?? null,
                 'section_name' => $qData['section'],
                 'question_text' => $qData['text'],
                 'explanation_taglish' => $qData['explanation'],
@@ -174,7 +244,7 @@ class ExamSeeder extends Seeder
             }
         }
 
-        // Seed a few UPCAT questions too
+        // Seed UPCAT questions
         $upcatQuestions = [
             [
                 'text' => 'What is the derivative of f(x) = 3x² + 2x - 5?',
@@ -216,6 +286,7 @@ class ExamSeeder extends Seeder
         foreach ($upcatQuestions as $qData) {
             $question = Question::create([
                 'exam_id' => $upcat->id,
+                'subtopic_id' => $upcatSection2Subtopic[$qData['section']] ?? null,
                 'section_name' => $qData['section'],
                 'question_text' => $qData['text'],
                 'explanation_taglish' => $qData['explanation'],
@@ -235,5 +306,8 @@ class ExamSeeder extends Seeder
                 ]);
             }
         }
+
+        // Refresh subtopic question count caches
+        Subtopic::all()->each->refreshQuestionCount();
     }
 }

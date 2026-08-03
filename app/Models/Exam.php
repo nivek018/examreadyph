@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Exam extends Model
 {
     protected $fillable = [
-        'category_id', 'name', 'slug', 'description', 'total_questions',
-        'time_limit_seconds', 'passing_score_percent', 'difficulty',
+        'category_id', 'name', 'slug', 'description',
+        'seo_title', 'seo_description', 'long_description',
+        'total_questions', 'time_limit_seconds', 'passing_score_percent', 'difficulty',
         'is_premium', 'is_active', 'shuffle_questions', 'shuffle_options',
         'show_explanations', 'allow_review', 'sections_json',
     ];
@@ -46,6 +47,16 @@ class Exam extends Model
     public function activeQuestions(): HasMany
     {
         return $this->hasMany(Question::class)->where('is_active', true);
+    }
+
+    public function subtopics(): HasMany
+    {
+        return $this->hasMany(Subtopic::class)->orderBy('sort_order');
+    }
+
+    public function activeSubtopics(): HasMany
+    {
+        return $this->hasMany(Subtopic::class)->where('is_active', true)->orderBy('sort_order');
     }
 
     public function sessions(): HasMany

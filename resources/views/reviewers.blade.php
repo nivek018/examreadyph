@@ -30,13 +30,13 @@
             {{-- Exam Cards Grid --}}
             <div id="exams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($exams as $exam)
-                <div class="exam-card flat-card card p-6 flex flex-col justify-between" data-category="{{ $exam->category->slug ?? 'all' }}">
+                <a href="{{ route('reviewer.show', $exam) }}" class="exam-card flat-card card p-6 flex flex-col justify-between hover:border-blue-500 dark:hover:border-blue-500 transition group" data-category="{{ $exam->category->slug ?? 'all' }}">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <span class="{{ $exam->category->color_class ?? 'badge-blue' }}">{{ $exam->category->name ?? 'General' }}</span>
                             <span class="text-xs text-slate-500 dark:text-slate-400 font-medium"><i class="fa-solid fa-list-check mr-1"></i> {{ $exam->questions_count }} Questions</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $exam->name }}</h3>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">{{ $exam->name }}</h3>
                         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">{{ Str::limit($exam->description, 120) }}</p>
                     </div>
                     <div class="pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
@@ -48,16 +48,11 @@
                             @endif
                             <span class="text-xs text-slate-500"><i class="fa-solid fa-clock mr-1"></i> {{ round($exam->time_limit_seconds / 60) }}m</span>
                         </div>
-
-                        {{-- Working Form --}}
-                        <form method="POST" action="{{ route('exam.start', $exam) }}">
-                            @csrf
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded transition flex items-center gap-1.5 shadow-sm hover:scale-105">
-                                <span>Start Review</span> <i class="fa-solid fa-arrow-right"></i>
-                            </button>
-                        </form>
+                        <span class="bg-blue-600 group-hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded transition flex items-center gap-1.5 shadow-sm group-hover:scale-105">
+                            <span>View Reviewer</span> <i class="fa-solid fa-arrow-right"></i>
+                        </span>
                     </div>
-                </div>
+                </a>
                 @empty
                 <div class="col-span-3 text-center py-12 text-slate-500">
                     <i class="fa-solid fa-book-open text-4xl mb-3 text-slate-400"></i>

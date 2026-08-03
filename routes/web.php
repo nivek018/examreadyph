@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\ReportedQuestionController;
 use App\Http\Controllers\Admin\AdPopupController;
+use App\Http\Controllers\Admin\SubtopicController;
 use App\Http\Controllers\AdTrackingController;
+use App\Http\Controllers\SubjectPageController;
+use App\Http\Controllers\ExamSetupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +33,15 @@ Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 // Ad Tracking AJAX endpoints
 Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
 Route::post('/ads/{ad}/click', [AdTrackingController::class, 'click'])->name('ads.click');
+
+// SEO Subject Landing Pages
+Route::get('/reviewers/{exam}', [SubjectPageController::class, 'show'])->name('reviewer.show');
+Route::get('/reviewers/{exam}/{subtopic}', [SubjectPageController::class, 'subtopic'])->name('reviewer.subtopic');
+
+// Exam Setup & Mode Selection
+Route::get('/exam/{exam}/setup', [ExamSetupController::class, 'setup'])->name('exam.setup');
+Route::get('/exam/{exam}/practice-setup', [ExamSetupController::class, 'practiceSetup'])->name('exam.practice-setup');
+Route::post('/exam/{exam}/start-session', [ExamSetupController::class, 'startSession'])->name('exam.start-session');
 
 // Exam Session Routes (Guest & User accessible)
 Route::post('/exam/{exam}/start', [ExamSessionController::class, 'start'])->name('exam.start');
@@ -80,6 +92,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
     // Ad Campaigns CRUD
     Route::resource('ads', AdPopupController::class)->except(['show']);
+
+    // Subtopics CRUD
+    Route::resource('subtopics', SubtopicController::class)->except(['show']);
 
     // User Management
     Route::get('users', [UserController::class, 'index'])->name('users.index');

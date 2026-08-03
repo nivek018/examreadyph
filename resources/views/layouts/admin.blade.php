@@ -48,6 +48,10 @@
                     <i class="fa-solid fa-circle-question w-5 text-center"></i> Questions
                 </a>
 
+                <a href="{{ route('admin.subtopics.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.subtopics.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+                    <i class="fa-solid fa-puzzle-piece w-5 text-center text-teal-400"></i> Subtopics
+                </a>
+
                 <a href="{{ route('admin.reported-questions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.reported-questions.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
                     <i class="fa-solid fa-triangle-exclamation w-5 text-center text-rose-400"></i> Reported Issues
                 </a>
