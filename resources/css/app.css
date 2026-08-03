@@ -1,0 +1,147 @@
+/* Imports MUST come before @tailwind directives */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Custom Base Styles ===== */
+@layer base {
+    body {
+        font-family: 'Inter', sans-serif;
+        @apply transition-colors duration-200;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .dark ::-webkit-scrollbar-track {
+        background: #0f172a;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f8fafc;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+        background: #334155;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+
+    /* Selection color */
+    ::selection {
+        @apply bg-blue-600 text-white;
+    }
+}
+
+/* ===== Component Styles ===== */
+@layer components {
+    /* Flat card with subtle hover */
+    .flat-card {
+        @apply transition-all duration-150 ease-in-out;
+    }
+
+    .flat-card:hover {
+        @apply -translate-y-0.5;
+    }
+
+    /* Tab button active state */
+    .tab-btn.active {
+        @apply bg-blue-600 text-white border-blue-600;
+    }
+
+    /* Section heading pattern */
+    .section-eyebrow {
+        @apply text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2;
+    }
+
+    .section-title {
+        @apply text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight;
+    }
+
+    .section-subtitle {
+        @apply text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-2;
+    }
+
+    /* Exam option button states */
+    .quiz-option {
+        @apply w-full text-left p-3.5 rounded-lg border border-slate-300 dark:border-slate-700
+               bg-slate-50 dark:bg-slate-900/80 hover:border-blue-500 transition
+               flex items-center justify-between text-xs sm:text-sm font-medium
+               text-slate-800 dark:text-slate-200 cursor-pointer;
+    }
+
+    .quiz-option-correct {
+        @apply w-full text-left p-3.5 rounded-lg border-2 border-emerald-500
+               bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-between
+               text-xs sm:text-sm font-semibold text-emerald-800 dark:text-emerald-300;
+    }
+
+    .quiz-option-wrong {
+        @apply w-full text-left p-3.5 rounded-lg border-2 border-rose-500
+               bg-rose-50 dark:bg-rose-950/40 flex items-center justify-between
+               text-xs sm:text-sm font-semibold text-rose-800 dark:text-rose-300;
+    }
+
+    .quiz-option-disabled {
+        @apply w-full text-left p-3.5 rounded-lg border border-slate-200 dark:border-slate-700
+               bg-slate-100/50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500
+               flex items-center justify-between text-xs sm:text-sm;
+    }
+
+    /* Brand button */
+    .btn-brand {
+        @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg
+               transition shadow-sm flex items-center justify-center gap-2;
+    }
+
+    .btn-brand-outline {
+        @apply bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700
+               text-slate-800 dark:text-slate-200 font-semibold rounded-lg
+               border border-slate-300 dark:border-slate-700 transition
+               flex items-center justify-center gap-2;
+    }
+
+    /* Card base */
+    .card {
+        @apply bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700;
+    }
+
+    /* Badge variants */
+    .badge-blue {
+        @apply px-2.5 py-1 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400
+               font-bold text-xs border border-blue-200 dark:border-blue-800;
+    }
+
+    .badge-amber {
+        @apply px-2.5 py-1 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400
+               font-bold text-xs border border-amber-200 dark:border-amber-800;
+    }
+
+    .badge-purple {
+        @apply px-2.5 py-1 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-400
+               font-bold text-xs border border-purple-200 dark:border-purple-800;
+    }
+
+    .badge-teal {
+        @apply px-2.5 py-1 rounded bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-400
+               font-bold text-xs border border-teal-200 dark:border-teal-800;
+    }
+
+    .badge-emerald {
+        @apply px-2.5 py-1 rounded bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400
+               font-bold text-xs border border-emerald-200 dark:border-emerald-800;
+    }
+}
