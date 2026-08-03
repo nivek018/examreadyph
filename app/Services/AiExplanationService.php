@@ -15,8 +15,8 @@ class AiExplanationService
      */
     public function explainQuestion(Question $question, bool $forceRegenerate = false): string
     {
-        $apiKey = $this->settings->get('groq_api_key') ?: config('services.groq.api_key');
-        $model = $this->settings->get('groq_model') ?: config('services.groq.model', 'llama-3.3-70b-versatile');
+        $apiKey = $this->settings->get('groq_api_key');
+        $model = $this->settings->get('groq_model') ?: 'llama-3.1-8b-instant';
 
         // If no Groq API Key configured, fallback to database static explanation
         if (empty($apiKey)) {

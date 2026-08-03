@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class SystemSetting extends Model
 {
@@ -30,7 +31,13 @@ class SystemSetting extends Model
         $setting = static::where('key', $key)->first();
 
         if ($setting) {
-            $setting->update(['value' => is_array($value) || is_object($value) ? json_encode($value) : (string) $value]);
+            $val = is_array($value) || is_object($value) ? json_encode($value) : (string) $value;
+            if ($setting->type === 'encrypted' && !empty($val) && !str_starts_with($val, 'eyJ')) {
+                try {
+                    $val = Crypt::encryptString($val);
+                } catch (\Throwable $e) {}
+            }
+            $setting->update(['value' => $val]);
         }
     }
 
@@ -47,8 +54,19 @@ class SystemSetting extends Model
             'int' => (int) $value,
             'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
             'json' => json_decode($value, true),
+            'encrypted' => static::decryptValue($value),
             'text', 'string' => $value,
             default => $value,
         };
+    }
+
+    protected static function decryptValue(?string $value): ?string
+    {
+        if (empty($value)) return null;
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Throwable $e) {
+            return $value;
+        }
     }
 }
