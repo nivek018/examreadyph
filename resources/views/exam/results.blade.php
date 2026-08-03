@@ -137,21 +137,31 @@
                     {{-- AI Explanation Toggle Button --}}
                     @if($q->explanation_taglish && $exam->show_explanations)
                     <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                        <button @click="toggleExplanation({{ $q->id }})"
+                        <button @click="toggleExplanation({{ $q->id }}, @js($q->explanation_taglish))"
                                 class="text-xs font-bold px-3.5 py-2 rounded-xl border transition flex items-center gap-2 cursor-pointer"
                                 :class="isRevealed({{ $q->id }}) ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-100 dark:hover:bg-purple-900/60'">
-                            <i class="fa-solid" :class="isRevealed({{ $q->id }}) ? 'fa-eye-slash' : 'fa-lightbulb'"></i>
-                            <span x-text="isRevealed({{ $q->id }}) ? 'Hide AI Explanation' : 'Show AI Taglish Explanation'"></span>
+                            <i class="fa-solid" :class="isRevealed({{ $q->id }}) ? 'fa-eye-slash' : 'fa-robot'"></i>
+                            <span x-text="isRevealed({{ $q->id }}) ? 'Hide AI Explanation' : 'Show AI Explanation'"></span>
                         </button>
 
-                        {{-- Collapsible Taglish Explanation --}}
+                        {{-- Collapsible Taglish Explanation with Typewriter Effect --}}
                         <div x-show="isRevealed({{ $q->id }})" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                              class="mt-3 p-4 sm:p-5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs sm:text-sm">
-                            <div class="font-extrabold text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-robot text-purple-500"></i> AI Taglish Step-by-Step Explanation
+                            <div class="flex items-center justify-between mb-2 pb-2 border-b border-purple-200/60 dark:border-purple-900/50">
+                                <div class="font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-robot text-purple-500"></i> AI Taglish Step-by-Step Explanation
+                                </div>
+                                
+                                {{-- Explain Again Link --}}
+                                <button @click="explainAgain({{ $q->id }}, @js($q->explanation_taglish))"
+                                        class="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 underline flex items-center gap-1 cursor-pointer">
+                                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Explain Again
+                                </button>
                             </div>
-                            <div class="text-slate-700 dark:text-slate-200 leading-relaxed font-normal pt-1 border-t border-purple-200/60 dark:border-purple-900/50">
-                                {!! nl2br(e($q->explanation_taglish)) !!}
+
+                            <div class="text-slate-700 dark:text-slate-200 leading-relaxed font-normal pt-1">
+                                <span x-html="getTypedText({{ $q->id }}, @js($q->explanation_taglish))"></span>
+                                <span x-show="isTyping({{ $q->id }})" class="inline-block w-1.5 h-4 bg-purple-600 animate-pulse ml-0.5 align-middle"></span>
                             </div>
                         </div>
                     </div>
@@ -215,6 +225,8 @@
                 isLoggedIn: config.isLoggedIn,
                 maxAllowed: config.maxAllowed,
                 revealedMap: {},
+                typedTexts: {},
+                typingTimers: {},
                 showLimitModal: false,
 
                 get revealedCount() {
@@ -225,7 +237,16 @@
                     return !!this.revealedMap[qId];
                 },
 
-                toggleExplanation(qId) {
+                getTypedText(qId, fullText) {
+                    if (!this.typedTexts[qId]) return '';
+                    return this.typedTexts[qId].text.replace(/\n/g, '<br>');
+                },
+
+                isTyping(qId) {
+                    return this.typedTexts[qId] && !this.typedTexts[qId].isDone;
+                },
+
+                toggleExplanation(qId, fullText) {
                     if (this.revealedMap[qId]) {
                         delete this.revealedMap[qId];
                         this.revealedMap = { ...this.revealedMap };
@@ -239,6 +260,31 @@
 
                     this.revealedMap[qId] = true;
                     this.revealedMap = { ...this.revealedMap };
+
+                    if (!this.typedTexts[qId] || !this.typedTexts[qId].text) {
+                        this.startTypewriter(qId, fullText);
+                    }
+                },
+
+                explainAgain(qId, fullText) {
+                    this.startTypewriter(qId, fullText);
+                },
+
+                startTypewriter(qId, fullText) {
+                    if (this.typingTimers[qId]) clearInterval(this.typingTimers[qId]);
+                    this.typedTexts[qId] = { text: '', isDone: false };
+
+                    let i = 0;
+                    const speed = 8;
+                    this.typingTimers[qId] = setInterval(() => {
+                        if (i < fullText.length) {
+                            this.typedTexts[qId].text += fullText.charAt(i);
+                            i++;
+                        } else {
+                            this.typedTexts[qId].isDone = true;
+                            clearInterval(this.typingTimers[qId]);
+                        }
+                    }, speed);
                 }
             };
         }
