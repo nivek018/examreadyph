@@ -31,6 +31,15 @@ Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
 Route::post('/ads/{ad}/click', [AdTrackingController::class, 'click'])->name('ads.click');
 
+// Exam Session Routes (Guest & User accessible)
+Route::post('/exam/{exam}/start', [ExamSessionController::class, 'start'])->name('exam.start');
+Route::get('/exam/session/{session}', [ExamSessionController::class, 'take'])->name('exam.take');
+Route::post('/exam/session/{session}/answer', [ExamSessionController::class, 'answer'])->name('exam.answer');
+Route::post('/exam/session/{session}/navigate', [ExamSessionController::class, 'navigate'])->name('exam.navigate');
+Route::post('/exam/session/{session}/report-question', [ExamSessionController::class, 'reportQuestion'])->name('exam.reportQuestion');
+Route::post('/exam/session/{session}/submit', [ExamSessionController::class, 'submit'])->name('exam.submit');
+Route::get('/exam/session/{session}/results', [ExamSessionController::class, 'results'])->name('exam.results');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
@@ -44,15 +53,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Exam Session Routes
-    Route::post('/exam/{exam}/start', [ExamSessionController::class, 'start'])->name('exam.start');
-    Route::get('/exam/session/{session}', [ExamSessionController::class, 'take'])->name('exam.take');
-    Route::post('/exam/session/{session}/answer', [ExamSessionController::class, 'answer'])->name('exam.answer');
-    Route::post('/exam/session/{session}/navigate', [ExamSessionController::class, 'navigate'])->name('exam.navigate');
-    Route::post('/exam/session/{session}/report-question', [ExamSessionController::class, 'reportQuestion'])->name('exam.reportQuestion');
-    Route::post('/exam/session/{session}/submit', [ExamSessionController::class, 'submit'])->name('exam.submit');
-    Route::get('/exam/session/{session}/results', [ExamSessionController::class, 'results'])->name('exam.results');
 });
 
 /*

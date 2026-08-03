@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('exam_sessions', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->string('guest_token')->nullable()->index();
             $table->foreignId('exam_id')->constrained('exams')->cascadeOnDelete();
             $table->timestamp('started_at')->useCurrent();
             $table->timestamp('finished_at')->nullable();

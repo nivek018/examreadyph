@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ExamSession extends Model
 {
     protected $fillable = [
-        'uuid', 'user_id', 'exam_id', 'started_at', 'finished_at', 'expires_at',
+        'uuid', 'user_id', 'guest_token', 'exam_id', 'started_at', 'finished_at', 'expires_at',
         'time_limit_seconds', 'current_question_index', 'status',
         'score', 'total_questions', 'correct_count', 'wrong_count',
         'unanswered_count', 'question_order_json',

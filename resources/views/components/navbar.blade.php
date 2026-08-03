@@ -14,11 +14,12 @@
         </a>
 
         {{-- Navigation Links (Desktop) --}}
-        <nav class="hidden md:flex items-center gap-8">
-            <a href="{{ route('home') }}#categories" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Reviewers</a>
-            <a href="{{ route('pricing') }}" class="text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-500 transition"><i class="fa-solid fa-crown mr-1"></i> Pricing</a>
-            <a href="{{ route('home') }}#how-it-works" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Practice Tests</a>
-            <a href="{{ route('home') }}#faq" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a>
+        <nav class="hidden md:flex items-center gap-7">
+            <a href="{{ route('reviewers') }}" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Reviewers</a>
+            <a href="{{ route('home') }}#how-it-works" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">How to Use</a>
+            <a href="{{ route('pricing') }}" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Pricing</a>
+            <a href="#community" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Community</a>
+            <a href="#blog" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Blog</a>
         </nav>
 
         {{-- Right Controls --}}
@@ -82,10 +83,11 @@
 
     {{-- Mobile Menu Drawer --}}
     <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-6 space-y-3">
-        <a href="{{ route('home') }}#categories" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Reviewers</a>
-        <a href="{{ route('home') }}#how-it-works" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Practice Tests</a>
-        <a href="{{ route('home') }}#articles" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Study Guides</a>
-        <a href="{{ route('home') }}#faq" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">FAQ</a>
+        <a href="{{ route('reviewers') }}" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Reviewers</a>
+        <a href="{{ route('home') }}#how-it-works" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">How to Use</a>
+        <a href="{{ route('pricing') }}" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Pricing</a>
+        <a href="#community" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Community</a>
+        <a href="#blog" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Blog</a>
 
         @guest
             <div class="flex gap-3 pt-2">

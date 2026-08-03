@@ -21,12 +21,30 @@ class ExamSessionController extends Controller
     public function start(Exam $exam)
     {
         $user = auth()->user();
+        $isPremium = $user ? $user->isPremium() : false;
+
+        if ($exam->is_premium && !$isPremium) {
+            return redirect()->route('pricing')
+                ->with('error', 'This is a Premium exam. Please upgrade to Pro to unlock.');
+        }
+
+        $guestToken = null;
+        if (!$user) {
+            $guestToken = session()->get('guest_token');
+            if (!$guestToken) {
+                $guestToken = \Illuminate\Support\Str::random(32);
+                session()->put('guest_token', $guestToken);
+            }
+        }
 
         // Check for in-progress session to resume
-        $existingSession = ExamSession::where('user_id', $user->id)
-            ->where('exam_id', $exam->id)
-            ->where('status', 'in_progress')
-            ->first();
+        $sessionQuery = ExamSession::where('exam_id', $exam->id)->where('status', 'in_progress');
+        if ($user) {
+            $sessionQuery->where('user_id', $user->id);
+        } else {
+            $sessionQuery->where('guest_token', $guestToken);
+        }
+        $existingSession = $sessionQuery->first();
 
         if ($existingSession && $existingSession->isActive()) {
             return redirect()->route('exam.take', $existingSession);
@@ -40,8 +58,7 @@ class ExamSessionController extends Controller
         // Get active questions for this exam
         $questionsQuery = $exam->activeQuestions();
 
-        // If not premium user, exclude premium questions
-        if (!$user->isPremium()) {
+        if (!$isPremium) {
             $questionsQuery->where('is_premium', false);
         }
 
@@ -66,7 +83,8 @@ class ExamSessionController extends Controller
 
         // Create session
         $session = ExamSession::create([
-            'user_id' => $user->id,
+            'user_id' => $user?->id,
+            'guest_token' => $guestToken,
             'exam_id' => $exam->id,
             'started_at' => now(),
             'expires_at' => $expiresAt,
@@ -324,8 +342,21 @@ class ExamSessionController extends Controller
 
     protected function authorizeSession(ExamSession $session): void
     {
-        if ($session->user_id !== auth()->id() && (!auth()->check() || !auth()->user()->isAdmin())) {
-            abort(403, 'Unauthorized access. You do not own this exam session.');
+        $userId = auth()->id();
+        $guestToken = session()->get('guest_token');
+
+        if ($session->user_id && $userId && $session->user_id === $userId) {
+            return;
         }
+
+        if ($session->guest_token && $guestToken && $session->guest_token === $guestToken) {
+            return;
+        }
+
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            return;
+        }
+
+        abort(403, 'Unauthorized access. You do not own this exam session.');
     }
 }
