@@ -306,6 +306,23 @@ class ExamSessionController extends Controller
             'force_regenerate' => 'nullable|boolean',
         ]);
 
+        $user = auth()->user();
+
+        // Server-side credit enforcement for logged-in users
+        if ($user) {
+            if (!$user->consumeAiCredit()) {
+                $limit = $user->getAiCreditLimit();
+                return response()->json([
+                    'success' => false,
+                    'error' => 'no_credits',
+                    'message' => "You have used all {$limit} AI explanation credits for this period.",
+                    'credits_used' => $user->getAiCreditsUsed(),
+                    'credits_limit' => $limit,
+                    'credits_remaining' => 0,
+                ], 200);
+            }
+        }
+
         $question = Question::with(['options', 'exam', 'subtopic'])->findOrFail($validated['question_id']);
         $forceRegenerate = (bool) ($validated['force_regenerate'] ?? false);
 
@@ -314,6 +331,9 @@ class ExamSessionController extends Controller
         return response()->json([
             'success' => true,
             'explanation' => $explanation,
+            'credits_used' => $user ? $user->getAiCreditsUsed() : null,
+            'credits_limit' => $user ? $user->getAiCreditLimit() : null,
+            'credits_remaining' => $user ? $user->getRemainingAiCredits() : null,
         ]);
     }
 
@@ -350,10 +370,17 @@ class ExamSessionController extends Controller
         $exam = $session->exam;
         $passed = $session->score >= $exam->passing_score_percent;
 
+        // AI credit data for the frontend
+        $user = auth()->user();
+        $aiCreditLimit = $user ? $user->getAiCreditLimit() : 2;
+        $aiCreditsUsed = $user ? $user->getAiCreditsUsed() : 0;
+
         return view('exam.results', [
             'session' => $session,
             'exam' => $exam,
             'passed' => $passed,
+            'aiCreditLimit' => $aiCreditLimit,
+            'aiCreditsUsed' => $aiCreditsUsed,
         ]);
     }
 

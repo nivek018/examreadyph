@@ -6,7 +6,9 @@
              x-data="resultsManager({
                  sessionId: '{{ $session->uuid }}',
                  isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
-                 maxAllowed: {{ auth()->check() ? (auth()->user()->is_premium ? 9999 : 50) : 2 }}
+                 isPaid: {{ (auth()->check() && auth()->user()->isPremium()) ? 'true' : 'false' }},
+                 maxAllowed: {{ $aiCreditLimit }},
+                 serverCreditsUsed: {{ $aiCreditsUsed }}
              })">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -89,7 +91,7 @@
                 {{-- AI Explanation Usage Counter --}}
                 <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs text-purple-700 dark:text-purple-300 font-semibold">
                     <i class="fa-solid fa-robot"></i>
-                    <span>AI Explanations Used: <strong x-text="unlockedCount"></strong> / <span x-text="maxAllowed === 9999 ? 'Unlimited' : maxAllowed"></span></span>
+                    <span>AI Credits Used: <strong x-text="creditsUsed"></strong> / <span x-text="maxAllowed"></span></span>
                 </div>
             </div>
 
@@ -138,9 +140,6 @@
                     {{-- AI Explanation Toggle Button --}}
                     @if($exam->show_explanations)
                     <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                        {{-- Hidden element storing raw explanation --}}
-                        <div id="raw-exp-{{ $q->id }}" data-explanation="{{ $q->explanation_taglish }}" class="hidden"></div>
-
                         <button @click="toggleExplanation({{ $q->id }}, @js($q->explanation_taglish))"
                                 class="text-xs font-bold px-3.5 py-2 rounded-xl border transition flex items-center gap-2 cursor-pointer"
                                 :class="isOpen({{ $q->id }}) ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : (isUnlocked({{ $q->id }}) ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-700' : 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-100 dark:hover:bg-purple-900/60')">
@@ -148,7 +147,7 @@
                             <span x-text="isOpen({{ $q->id }}) ? 'Hide AI Explanation' : (isUnlocked({{ $q->id }}) ? 'Show Unlocked AI Explanation' : 'Show AI Explanation')"></span>
                         </button>
 
-                        {{-- Collapsible Taglish Explanation with Typewriter Effect --}}
+                        {{-- Collapsible Explanation with Typewriter Effect --}}
                         <div x-show="isOpen({{ $q->id }})" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                              class="mt-3 p-4 sm:p-5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs sm:text-sm">
                             <div class="flex items-center justify-between mb-2 pb-2 border-b border-purple-200/60 dark:border-purple-900/50">
@@ -185,15 +184,16 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
 
+                {{-- Guest User (not logged in) --}}
                 <template x-if="!isLoggedIn">
                     <div>
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Guest Limit Reached (2/2)</h3>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">AI Credits Used Up (2/2)</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                            You have used your 2 free AI explanations as a guest taker. Create a free account to unlock <strong>50 AI explanations</strong> per session!
+                            You have used your 2 free AI explanation credits. Create a free account to track your credits, or subscribe to unlock <strong>50 AI explanations per month</strong>!
                         </p>
                         <div class="space-y-2.5">
                             <a href="{{ route('register') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md block">
-                                Create Free Account (Unlock 50 AI)
+                                Create Free Account
                             </a>
                             <a href="{{ route('login') }}" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl text-sm hover:bg-slate-200 transition block">
                                 Already Have an Account? Log In
@@ -202,15 +202,37 @@
                     </div>
                 </template>
 
-                <template x-if="isLoggedIn">
+                {{-- Logged-in Free User (no subscription) --}}
+                <template x-if="isLoggedIn && !isPaid">
                     <div>
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Daily Free Limit Reached (50/50)</h3>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">AI Credits Used Up (<span x-text="creditsUsed"></span>/<span x-text="maxAllowed"></span>)</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                            You've reached your free daily limit of 50 AI explanations. Upgrade to <strong>ExamReady Premium</strong> for unlimited AI explanations across all Civil Service reviewers!
+                            You've used all your free AI explanation credits this month. Upgrade to <strong>ExamReady Pro</strong> to unlock <strong>50 AI explanations per month</strong>!
                         </p>
                         <div class="space-y-2.5">
+                            <a href="{{ route('pricing') }}" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 rounded-xl text-sm transition shadow-md block">
+                                <i class="fa-solid fa-crown mr-1.5"></i> Upgrade to Pro (50 AI/month)
+                            </a>
+                            <button @click="showLimitModal = false" class="w-full text-slate-500 font-semibold text-xs py-2">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Paid Subscriber (credits exhausted) --}}
+                <template x-if="isLoggedIn && isPaid">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Monthly AI Credits Used Up (<span x-text="creditsUsed"></span>/<span x-text="maxAllowed"></span>)</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            You've used all your AI explanation credits for this month. Your credits will reset on your next billing cycle.
+                        </p>
+                        <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-sm text-amber-800 dark:text-amber-300 mb-5">
+                            <i class="fa-solid fa-coins mr-1.5"></i> Need more? You can purchase additional AI credits.
+                        </div>
+                        <div class="space-y-2.5">
                             <a href="{{ route('pricing') }}" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md block">
-                                Upgrade to Premium (Unlimited AI)
+                                <i class="fa-solid fa-coins mr-1.5"></i> Buy More AI Credits
                             </a>
                             <button @click="showLimitModal = false" class="w-full text-slate-500 font-semibold text-xs py-2">
                                 Close
@@ -228,8 +250,9 @@
             return {
                 sessionId: config.sessionId,
                 isLoggedIn: config.isLoggedIn,
+                isPaid: config.isPaid,
                 maxAllowed: config.maxAllowed,
-                creditsUsed: 0,
+                creditsUsed: config.serverCreditsUsed || 0,
                 unlockedMap: {},
                 openMap: {},
                 cachedTexts: {},
@@ -239,20 +262,20 @@
 
                 init() {
                     try {
-                        const savedCredits = localStorage.getItem('ai_credits_' + this.sessionId);
                         const savedUnlocked = localStorage.getItem('ai_unlocked_' + this.sessionId);
                         const savedOpen = localStorage.getItem('ai_open_' + this.sessionId);
                         const savedCached = localStorage.getItem('ai_cached_' + this.sessionId);
 
-                        if (savedCredits) this.creditsUsed = parseInt(savedCredits, 10) || 0;
                         if (savedUnlocked) this.unlockedMap = JSON.parse(savedUnlocked);
                         if (savedOpen) this.openMap = JSON.parse(savedOpen);
                         if (savedCached) this.cachedTexts = JSON.parse(savedCached);
 
-                        const minUnlocked = Object.keys(this.unlockedMap).length;
-                        if (this.creditsUsed < minUnlocked) {
-                            this.creditsUsed = minUnlocked;
+                        // For guest users, also load credits from localStorage
+                        if (!this.isLoggedIn) {
+                            const savedCredits = localStorage.getItem('ai_credits_' + this.sessionId);
+                            if (savedCredits) this.creditsUsed = parseInt(savedCredits, 10) || 0;
                         }
+                        // For logged-in users, creditsUsed is already set from server
 
                         Object.keys(this.unlockedMap).forEach(qId => {
                             if (this.cachedTexts[qId]) {
@@ -260,10 +283,6 @@
                             }
                         });
                     } catch(e) {}
-                },
-
-                get unlockedCount() {
-                    return this.creditsUsed;
                 },
 
                 isUnlocked(qId) {
@@ -276,17 +295,19 @@
 
                 saveState() {
                     try {
-                        localStorage.setItem('ai_credits_' + this.sessionId, this.creditsUsed.toString());
                         localStorage.setItem('ai_unlocked_' + this.sessionId, JSON.stringify(this.unlockedMap));
                         localStorage.setItem('ai_open_' + this.sessionId, JSON.stringify(this.openMap));
                         localStorage.setItem('ai_cached_' + this.sessionId, JSON.stringify(this.cachedTexts));
+                        // Only save credits to localStorage for guests
+                        if (!this.isLoggedIn) {
+                            localStorage.setItem('ai_credits_' + this.sessionId, this.creditsUsed.toString());
+                        }
                     } catch(e) {}
                 },
 
                 getTypedText(qId, fallbackText) {
                     if (!this.typedTexts[qId]) return '';
                     let text = this.typedTexts[qId].text;
-                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                     return text.replace(/\n/g, '<br>');
                 },
 
@@ -308,8 +329,22 @@
                             body: JSON.stringify({ question_id: qId, force_regenerate: forceRegenerate }),
                         });
                         const data = await res.json();
+
+                        // Handle server-side credit exhaustion
+                        if (!data.success && data.error === 'no_credits') {
+                            this.typedTexts[qId] = { text: '', isDone: true };
+                            if (data.credits_used !== undefined) this.creditsUsed = data.credits_used;
+                            this.showLimitModal = true;
+                            return;
+                        }
+
                         const text = (data.success && data.explanation) ? data.explanation : fallbackText;
                         
+                        // Sync credits from server response for logged-in users
+                        if (this.isLoggedIn && data.credits_used !== undefined) {
+                            this.creditsUsed = data.credits_used;
+                        }
+
                         this.cachedTexts[qId] = text;
                         this.saveState();
 
@@ -327,14 +362,18 @@
                         return;
                     }
 
-                    if (!this.isUnlocked(qId)) {
+                    // For guests: check client-side credit limit
+                    if (!this.isLoggedIn && !this.isUnlocked(qId)) {
                         if (this.creditsUsed >= this.maxAllowed) {
                             this.showLimitModal = true;
                             return;
                         }
+                        this.creditsUsed++;
+                    }
+
+                    if (!this.isUnlocked(qId)) {
                         this.unlockedMap[qId] = true;
                         this.unlockedMap = { ...this.unlockedMap };
-                        this.creditsUsed++;
                     }
 
                     this.openMap[qId] = true;
@@ -346,18 +385,22 @@
                             this.startTypewriter(qId, this.cachedTexts[qId]);
                         }
                     } else {
+                        // For logged-in users, the server will enforce and deduct credits
                         this.fetchExplanation(qId, fallbackText, false);
                     }
                 },
 
                 explainAgain(qId, fallbackText) {
-                    if (this.creditsUsed >= this.maxAllowed) {
-                        this.showLimitModal = true;
-                        return;
+                    // For guests: check client-side credit limit
+                    if (!this.isLoggedIn) {
+                        if (this.creditsUsed >= this.maxAllowed) {
+                            this.showLimitModal = true;
+                            return;
+                        }
+                        this.creditsUsed++;
+                        this.saveState();
                     }
-                    this.creditsUsed++;
-                    this.saveState();
-
+                    // For logged-in users: server enforces and deducts
                     this.fetchExplanation(qId, fallbackText, true);
                 },
 
