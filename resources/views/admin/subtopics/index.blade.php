@@ -81,5 +81,7 @@
     </table>
 </div>
 
+@if(method_exists($subtopics, 'links'))
 <div class="mt-4">{{ $subtopics->withQueryString()->links() }}</div>
+@endif
 @endsection
