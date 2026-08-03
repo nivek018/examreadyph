@@ -231,6 +231,7 @@
                 maxAllowed: config.maxAllowed,
                 unlockedMap: {},
                 openMap: {},
+                cachedTexts: {},
                 typedTexts: {},
                 typingTimers: {},
                 showLimitModal: false,
@@ -239,12 +240,17 @@
                     try {
                         const savedUnlocked = localStorage.getItem('ai_unlocked_' + this.sessionId);
                         const savedOpen = localStorage.getItem('ai_open_' + this.sessionId);
-                        if (savedUnlocked) {
-                            this.unlockedMap = JSON.parse(savedUnlocked);
-                        }
-                        if (savedOpen) {
-                            this.openMap = JSON.parse(savedOpen);
-                        }
+                        const savedCached = localStorage.getItem('ai_cached_' + this.sessionId);
+
+                        if (savedUnlocked) this.unlockedMap = JSON.parse(savedUnlocked);
+                        if (savedOpen) this.openMap = JSON.parse(savedOpen);
+                        if (savedCached) this.cachedTexts = JSON.parse(savedCached);
+
+                        Object.keys(this.unlockedMap).forEach(qId => {
+                            if (this.cachedTexts[qId]) {
+                                this.typedTexts[qId] = { text: this.cachedTexts[qId], isDone: true };
+                            }
+                        });
                     } catch(e) {}
                 },
 
@@ -264,6 +270,7 @@
                     try {
                         localStorage.setItem('ai_unlocked_' + this.sessionId, JSON.stringify(this.unlockedMap));
                         localStorage.setItem('ai_open_' + this.sessionId, JSON.stringify(this.openMap));
+                        localStorage.setItem('ai_cached_' + this.sessionId, JSON.stringify(this.cachedTexts));
                     } catch(e) {}
                 },
 
@@ -293,6 +300,10 @@
                         });
                         const data = await res.json();
                         const text = (data.success && data.explanation) ? data.explanation : fallbackText;
+                        
+                        this.cachedTexts[qId] = text;
+                        this.saveState();
+
                         this.startTypewriter(qId, text);
                     } catch(e) {
                         this.startTypewriter(qId, fallbackText);
@@ -320,7 +331,13 @@
                     this.openMap = { ...this.openMap };
                     this.saveState();
 
-                    this.fetchExplanation(qId, fallbackText, false);
+                    if (this.cachedTexts[qId]) {
+                        if (!this.typedTexts[qId] || !this.typedTexts[qId].text) {
+                            this.startTypewriter(qId, this.cachedTexts[qId]);
+                        }
+                    } else {
+                        this.fetchExplanation(qId, fallbackText, false);
+                    }
                 },
 
                 explainAgain(qId, fallbackText) {
