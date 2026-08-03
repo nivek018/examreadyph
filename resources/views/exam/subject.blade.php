@@ -388,6 +388,7 @@
             </div>
 
             {{-- Schema.org JSON-LD Structured Data for Google rich snippets --}}
+            @verbatim
             <script type="application/ld+json">
             {
               "@context": "https://schema.org",
@@ -436,6 +437,7 @@
               ]
             }
             </script>
+            @endverbatim
         </div>
     </section>
 
