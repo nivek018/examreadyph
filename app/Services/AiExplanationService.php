@@ -18,24 +18,29 @@ class AiExplanationService
         $apiKey = $this->settings->get('groq_api_key');
         $model = $this->settings->get('groq_model') ?: 'llama-3.1-8b-instant';
 
-        // If no Groq API Key configured, fallback to database static explanation
+        // If no Groq API Key configured, construct a rich fallback explanation
         if (empty($apiKey)) {
-            return $question->explanation_taglish ?? 'No explanation available.';
+            return $this->formatFallbackExplanation($question);
         }
 
         try {
             $questionText = $question->question_text;
-            $options = $question->options->map(fn($o) => "{$o->letter}) {$o->text} " . ($o->is_correct ? '[CORRECT]' : ''))->implode("\n");
+            $options = $question->options->map(fn($o) => "{$o->letter}) {$o->text} " . ($o->is_correct ? '[CORRECT ANSWER]' : ''))->implode("\n");
             $examName = $question->exam->name ?? 'Civil Service Examination';
             $topicName = $question->subtopic->name ?? ($question->section_name ?? 'General Knowledge');
 
-            $systemPrompt = $this->settings->get('ai_system_prompt', "You are an expert Filipino exam tutor for ExamReadyPH.\nAnswer in Taglish (mix of Tagalog and English) to help Filipino students understand.\nBe concise, accurate, and encouraging.");
-            $systemPrompt = str_replace(['{exam_name}', '{topic_name}'], [$examName, $topicName], $systemPrompt);
+            $systemPrompt = "You are an expert Filipino exam tutor for ExamReady PH.\n"
+                          . "Your goal is to explain Civil Service exam questions in clear, friendly, and structured Taglish (Tagalog-English mix).\n"
+                          . "Format your response clearly into these 3 sections:\n"
+                          . "1. 💡 **Bakit ito ang Tamang Sagot?** (Explain the concept, law, or formula step-by-step).\n"
+                          . "2. ❌ **Bakit Mali ang Ibang Options?** (Briefly explain why other choices are incorrect).\n"
+                          . "3. 📌 **Exam Tip for CSC Takers:** (A practical memory tip or shortcut for the test).\n"
+                          . "Avoid simply repeating the question text or answer text. Provide real educational context and value.";
 
-            $userPrompt = "Please explain this multiple choice question step-by-step in clear, encouraging Taglish:\n\n"
+            $userPrompt = "Please explain this {$examName} ({$topicName}) question in structured Taglish:\n\n"
                         . "Question: {$questionText}\n\n"
-                        . "Options:\n{$options}\n\n"
-                        . ($forceRegenerate ? "Give a fresh, slightly different breakdown or analogy than before." : "Explain why the correct option is right and why other choices are wrong.");
+                        . "Choices:\n{$options}\n\n"
+                        . ($forceRegenerate ? "Provide a fresh, slightly different breakdown or analogy than before." : "Explain step-by-step why the correct choice is right and why the other options are wrong.");
 
             $response = Http::withToken($apiKey)
                 ->timeout(15)
@@ -46,7 +51,7 @@ class AiExplanationService
                         ['role' => 'user', 'content' => $userPrompt],
                     ],
                     'temperature' => 0.7,
-                    'max_tokens' => 500,
+                    'max_tokens' => 600,
                 ]);
 
             if ($response->successful()) {
@@ -61,7 +66,34 @@ class AiExplanationService
             Log::error('AiExplanationService error: ' . $e->getMessage());
         }
 
-        // Fallback to database explanation if API call fails
-        return $question->explanation_taglish ?? 'No explanation available.';
+        return $this->formatFallbackExplanation($question);
+    }
+
+    /**
+     * Format a rich, structured fallback explanation when Groq API is not connected.
+     */
+    protected function formatFallbackExplanation(Question $question): string
+    {
+        $correctOpt = $question->options->firstWhere('is_correct', true);
+        $correctLetter = $correctOpt->letter ?? 'A';
+        $correctText = $correctOpt->text ?? '';
+        $wrongOpts = $question->options->where('is_correct', false)->pluck('text')->map(fn($t) => "• {$t}")->implode("\n");
+
+        $dbExp = trim($question->explanation_taglish ?? '');
+
+        $output = "💡 **Bakit Option {$correctLetter} ({$correctText}) ang Tamang Sagot?**\n";
+        if (!empty($dbExp)) {
+            $output .= "{$dbExp}\n\n";
+        } else {
+            $output .= "Sa ilalim ng Civil Service Examination standards, ang Option {$correctLetter} ang tanging kumpletong tumutugon sa hinihingi ng tanong.\n\n";
+        }
+
+        if ($wrongOpts) {
+            $output .= "❌ **Bakit Mali ang Ibang Options?**\n{$wrongOpts}\nAng mga pagpipiliang ito ay hindi ganap na umaangkop o kulang sa itinatakda ng batas/prinsipyo.\n\n";
+        }
+
+        $output .= "📌 **Exam Tip for CSC Takers:** Tandaan na sa Civil Service Exam, laging piliin ang pinaka-direct at legally/logically accurate na probisyon o formula!";
+
+        return $output;
     }
 }

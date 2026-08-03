@@ -89,7 +89,7 @@
                 {{-- AI Explanation Usage Counter --}}
                 <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs text-purple-700 dark:text-purple-300 font-semibold">
                     <i class="fa-solid fa-robot"></i>
-                    <span>AI Explanations Revealed: <strong x-text="revealedCount"></strong> / <span x-text="maxAllowed === 9999 ? 'Unlimited' : maxAllowed"></span></span>
+                    <span>AI Explanations Used: <strong x-text="unlockedCount"></strong> / <span x-text="maxAllowed === 9999 ? 'Unlimited' : maxAllowed"></span></span>
                 </div>
             </div>
 
@@ -143,13 +143,13 @@
 
                         <button @click="toggleExplanation({{ $q->id }}, @js($q->explanation_taglish))"
                                 class="text-xs font-bold px-3.5 py-2 rounded-xl border transition flex items-center gap-2 cursor-pointer"
-                                :class="isRevealed({{ $q->id }}) ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-100 dark:hover:bg-purple-900/60'">
-                            <i class="fa-solid" :class="isRevealed({{ $q->id }}) ? 'fa-eye-slash' : 'fa-robot'"></i>
-                            <span x-text="isRevealed({{ $q->id }}) ? 'Hide AI Explanation' : 'Show AI Explanation'"></span>
+                                :class="isOpen({{ $q->id }}) ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : (isUnlocked({{ $q->id }}) ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-700' : 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-100 dark:hover:bg-purple-900/60')">
+                            <i class="fa-solid" :class="isOpen({{ $q->id }}) ? 'fa-eye-slash' : 'fa-robot'"></i>
+                            <span x-text="isOpen({{ $q->id }}) ? 'Hide AI Explanation' : (isUnlocked({{ $q->id }}) ? 'Show Unlocked AI Explanation' : 'Show AI Explanation')"></span>
                         </button>
 
                         {{-- Collapsible Taglish Explanation with Typewriter Effect --}}
-                        <div x-show="isRevealed({{ $q->id }})" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                        <div x-show="isOpen({{ $q->id }})" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                              class="mt-3 p-4 sm:p-5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs sm:text-sm">
                             <div class="flex items-center justify-between mb-2 pb-2 border-b border-purple-200/60 dark:border-purple-900/50">
                                 <div class="font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2">
@@ -229,41 +229,53 @@
                 sessionId: config.sessionId,
                 isLoggedIn: config.isLoggedIn,
                 maxAllowed: config.maxAllowed,
-                revealedMap: {},
+                unlockedMap: {},
+                openMap: {},
                 typedTexts: {},
                 typingTimers: {},
                 showLimitModal: false,
 
                 init() {
                     try {
-                        const saved = localStorage.getItem('ai_revealed_' + this.sessionId);
-                        if (saved) {
-                            this.revealedMap = JSON.parse(saved);
-                            Object.keys(this.revealedMap).forEach(qId => {
+                        const savedUnlocked = localStorage.getItem('ai_unlocked_' + this.sessionId);
+                        const savedOpen = localStorage.getItem('ai_open_' + this.sessionId);
+                        if (savedUnlocked) {
+                            this.unlockedMap = JSON.parse(savedUnlocked);
+                            Object.keys(this.unlockedMap).forEach(qId => {
                                 const fullText = document.getElementById('raw-exp-' + qId)?.dataset?.explanation || '';
                                 this.typedTexts[qId] = { text: fullText, isDone: true };
                             });
                         }
+                        if (savedOpen) {
+                            this.openMap = JSON.parse(savedOpen);
+                        }
                     } catch(e) {}
                 },
 
-                get revealedCount() {
-                    return Object.keys(this.revealedMap).length;
+                get unlockedCount() {
+                    return Object.keys(this.unlockedMap).length;
                 },
 
-                isRevealed(qId) {
-                    return !!this.revealedMap[qId];
+                isUnlocked(qId) {
+                    return !!this.unlockedMap[qId];
+                },
+
+                isOpen(qId) {
+                    return !!this.openMap[qId];
                 },
 
                 saveState() {
                     try {
-                        localStorage.setItem('ai_revealed_' + this.sessionId, JSON.stringify(this.revealedMap));
+                        localStorage.setItem('ai_unlocked_' + this.sessionId, JSON.stringify(this.unlockedMap));
+                        localStorage.setItem('ai_open_' + this.sessionId, JSON.stringify(this.openMap));
                     } catch(e) {}
                 },
 
                 getTypedText(qId, fullText) {
                     if (!this.typedTexts[qId]) return '';
-                    return this.typedTexts[qId].text.replace(/\n/g, '<br>');
+                    let text = this.typedTexts[qId].text;
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    return text.replace(/\n/g, '<br>');
                 },
 
                 isTyping(qId) {
@@ -271,20 +283,24 @@
                 },
 
                 toggleExplanation(qId, fullText) {
-                    if (this.revealedMap[qId]) {
-                        delete this.revealedMap[qId];
-                        this.revealedMap = { ...this.revealedMap };
+                    if (this.isOpen(qId)) {
+                        this.openMap[qId] = false;
+                        this.openMap = { ...this.openMap };
                         this.saveState();
                         return;
                     }
 
-                    if (this.revealedCount >= this.maxAllowed) {
-                        this.showLimitModal = true;
-                        return;
+                    if (!this.isUnlocked(qId)) {
+                        if (this.unlockedCount >= this.maxAllowed) {
+                            this.showLimitModal = true;
+                            return;
+                        }
+                        this.unlockedMap[qId] = true;
+                        this.unlockedMap = { ...this.unlockedMap };
                     }
 
-                    this.revealedMap[qId] = true;
-                    this.revealedMap = { ...this.revealedMap };
+                    this.openMap[qId] = true;
+                    this.openMap = { ...this.openMap };
                     this.saveState();
 
                     if (!this.typedTexts[qId] || !this.typedTexts[qId].text) {
@@ -294,7 +310,7 @@
 
                 async explainAgain(qId, fullText) {
                     if (this.typingTimers[qId]) clearInterval(this.typingTimers[qId]);
-                    this.typedTexts[qId] = { text: 'Thinking...', isDone: false, isGenerating: true };
+                    this.typedTexts[qId] = { text: 'Analyzing question and generating explanation...', isDone: false, isGenerating: true };
 
                     try {
                         const res = await fetch(`/exam/session/${this.sessionId}/explain-question`, {
@@ -318,7 +334,7 @@
                     this.typedTexts[qId] = { text: '', isDone: false };
 
                     let i = 0;
-                    const speed = 8;
+                    const speed = 6;
                     this.typingTimers[qId] = setInterval(() => {
                         if (i < fullText.length) {
                             this.typedTexts[qId].text += fullText.charAt(i);
