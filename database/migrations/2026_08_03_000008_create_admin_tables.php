@@ -56,7 +56,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('question_id')->constrained('questions')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('reason', ['incorrect_answer', 'unclear', 'duplicate', 'offensive'])->default('incorrect_answer');
+            $table->string('reason')->default('incorrect_answer');
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'resolved', 'dismissed'])->default('pending');
             $table->foreignId('resolved_by')->nullable()->constrained('users')->nullOnDelete();

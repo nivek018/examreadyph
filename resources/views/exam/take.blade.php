@@ -58,7 +58,7 @@
             <div class="flex flex-wrap gap-3 mb-4 text-[10px] text-slate-500 dark:text-slate-400">
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-600"></span> Current</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-500"></span> Answered</span>
-                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500"></span> Flagged</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500"></span> Bookmarked</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-300 dark:bg-slate-600"></span> Unanswered</span>
             </div>
 
@@ -87,10 +87,15 @@
                         @endif
                     </div>
                     <div class="flex items-center gap-2">
-                        {{-- Flag Button --}}
+                        {{-- Bookmark Button --}}
                         <button @click="toggleFlag()" class="px-3 py-1.5 rounded-lg border text-xs font-medium transition"
-                                :class="isFlagged ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-600' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:text-amber-600'">
-                            <i class="fa-solid fa-flag mr-1"></i> <span x-text="isFlagged ? 'Flagged' : 'Flag'"></span>
+                                :class="isFlagged ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 font-bold' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:text-amber-600'">
+                            <i class="fa-solid fa-bookmark mr-1"></i> <span x-text="isFlagged ? 'Bookmarked' : 'Bookmark'"></span>
+                        </button>
+
+                        {{-- Report Question Button --}}
+                        <button @click="showReportModal = true; reportSuccessMsg = ''" class="px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/60 bg-rose-50/50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Report Issue
                         </button>
                     </div>
                 </div>
@@ -167,6 +172,67 @@
         </div>
     </div>
 
+    {{-- Report Question Modal --}}
+    <div x-show="showReportModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;">
+        <div class="card p-6 max-w-md w-full mx-4" @click.outside="showReportModal = false">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Report Question Issue
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Found an issue with Question <span class="font-bold text-slate-700 dark:text-slate-300" x-text="currentIndex + 1"></span>? Let us know so our team can fix it.</p>
+
+            <template x-if="reportSuccessMsg">
+                <div class="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-sm text-center mb-4">
+                    <i class="fa-solid fa-circle-check text-lg mb-1 block"></i>
+                    <span x-text="reportSuccessMsg"></span>
+                </div>
+            </template>
+
+            <form @submit.prevent="submitReport()" x-show="!reportSuccessMsg">
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Issue Type *</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer text-xs">
+                            <input type="radio" name="report_reason" value="incorrect_answer" x-model="reportReason" class="text-rose-600 focus:ring-rose-500">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">Wrong Answer / Incorrect Key</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer text-xs">
+                            <input type="radio" name="report_reason" value="incorrect_grammar" x-model="reportReason" class="text-rose-600 focus:ring-rose-500">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">Incorrect Grammar / Typo</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer text-xs">
+                            <input type="radio" name="report_reason" value="outdated" x-model="reportReason" class="text-rose-600 focus:ring-rose-500">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">Outdated Information</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer text-xs">
+                            <input type="radio" name="report_reason" value="unclear" x-model="reportReason" class="text-rose-600 focus:ring-rose-500">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">Unclear or Confusing Question</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer text-xs">
+                            <input type="radio" name="report_reason" value="other" x-model="reportReason" class="text-rose-600 focus:ring-rose-500">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">Other Issue</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Additional Details (Optional)</label>
+                    <textarea x-model="reportDescription" rows="3" placeholder="Describe what's wrong (e.g., Option B should be the correct answer because...)"
+                              class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 transition"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="submit" :disabled="isReporting" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane" x-show="!isReporting"></i>
+                        <span x-text="isReporting ? 'Submitting...' : 'Submit Report'"></span>
+                    </button>
+                    <button type="button" @click="showReportModal = false" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- Auto-submit form (hidden) --}}
     <form id="auto-submit-form" method="POST" action="{{ route('exam.submit', $session) }}" style="display: none;">
         @csrf
@@ -182,6 +248,11 @@
                 remainingSeconds: {{ $session->remaining_seconds }},
                 timerWarning: false,
                 showSubmitModal: false,
+                showReportModal: false,
+                reportReason: 'incorrect_answer',
+                reportDescription: '',
+                reportSuccessMsg: '',
+                isReporting: false,
                 selectedOptionId: {{ $answers[$question->id]->selected_option_id ?? 'null' }},
                 isFlagged: {{ ($answers[$question->id]->is_flagged ?? false) ? 'true' : 'false' }},
 
@@ -263,6 +334,34 @@
                             is_flagged: this.isFlagged,
                         }),
                     });
+                },
+
+                async submitReport() {
+                    this.isReporting = true;
+                    try {
+                        const res = await fetch(`/exam/session/${this.sessionId}/report-question`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({
+                                question_id: this.questionOrder[this.currentIndex],
+                                reason: this.reportReason,
+                                description: this.reportDescription,
+                            }),
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.reportSuccessMsg = data.message;
+                            this.reportDescription = '';
+                            setTimeout(() => { this.showReportModal = false; }, 2000);
+                        }
+                    } catch (e) {
+                        alert('Error submitting report.');
+                    } finally {
+                        this.isReporting = false;
+                    }
                 },
 
                 async goToQuestion(index) {

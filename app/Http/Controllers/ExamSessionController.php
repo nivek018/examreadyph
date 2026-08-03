@@ -6,6 +6,7 @@ use App\Models\Exam;
 use App\Models\ExamAnswer;
 use App\Models\ExamSession;
 use App\Models\Question;
+use App\Models\ReportedQuestion;
 use App\Models\UserProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -195,7 +196,34 @@ class ExamSessionController extends Controller
         $index = min($validated['index'], $session->total_questions - 1);
         $session->update(['current_question_index' => $index]);
 
-        return response()->json(['success' => true, 'index' => $index]);
+    /**
+     * Report an issue with a question (AJAX).
+     */
+    public function reportQuestion(Request $request, ExamSession $session)
+    {
+        $this->authorizeSession($session);
+
+        $validated = $request->validate([
+            'question_id' => 'required|exists:questions,id',
+            'reason' => 'required|string|in:incorrect_answer,incorrect_grammar,outdated,unclear,other',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        ReportedQuestion::create([
+            'question_id' => $validated['question_id'],
+            'user_id' => auth()->id(),
+            'reason' => $validated['reason'],
+            'description' => $validated['description'] ?? null,
+            'status' => 'pending',
+        ]);
+
+        // Increment question reported count
+        Question::where('id', $validated['question_id'])->increment('reported_count');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you! The issue has been reported to our moderation team.',
+        ]);
     }
 
     /**
