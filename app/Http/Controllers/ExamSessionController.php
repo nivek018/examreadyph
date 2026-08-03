@@ -123,36 +123,60 @@ class ExamSessionController extends Controller
 
         $questionOrder = $session->question_order_json;
         $currentIndex = $session->current_question_index;
-        $currentQuestionId = $questionOrder[$currentIndex] ?? $questionOrder[0];
 
-        // Load current question with options
-        $question = Question::with('options')->findOrFail($currentQuestionId);
+        // Fetch all session questions eager loading options
+        $allQuestions = Question::with('options')
+            ->whereIn('id', $questionOrder)
+            ->get()
+            ->keyBy('id');
 
-        // Load answers for navigator
+        // Build deterministic questions array following $questionOrder
+        $questionsData = [];
+        foreach ($questionOrder as $qId) {
+            $q = $allQuestions->get($qId);
+            if (!$q) continue;
+
+            // Shuffle options deterministically per session & question
+            $optionsArray = $q->options->all();
+            $seed = crc32($session->uuid . '-' . $q->id);
+            mt_srand($seed);
+            for ($i = count($optionsArray) - 1; $i > 0; $i--) {
+                $j = mt_rand(0, $i);
+                $tmp = $optionsArray[$i];
+                $optionsArray[$i] = $optionsArray[$j];
+                $optionsArray[$j] = $tmp;
+            }
+            mt_srand();
+
+            $formattedOptions = array_map(function ($opt) {
+                return [
+                    'id' => $opt->id,
+                    'letter' => $opt->letter,
+                    'text' => $opt->text,
+                    'is_correct' => (bool) $opt->is_correct,
+                ];
+            }, $optionsArray);
+
+            $questionsData[] = [
+                'id' => $q->id,
+                'question_text' => $q->question_text,
+                'section_name' => $q->section_name ?? ($q->subtopic->name ?? null),
+                'explanation_taglish' => $q->explanation_taglish,
+                'options' => $formattedOptions,
+            ];
+        }
+
+        // Load answers for session
         $answers = $session->answers()
             ->get()
             ->keyBy('question_id');
-
-        // Shuffle options uniquely and deterministically per session and question
-        $optionsArray = $question->options->all();
-        $seed = crc32($session->uuid . '-' . $question->id);
-        mt_srand($seed);
-        for ($i = count($optionsArray) - 1; $i > 0; $i--) {
-            $j = mt_rand(0, $i);
-            $tmp = $optionsArray[$i];
-            $optionsArray[$i] = $optionsArray[$j];
-            $optionsArray[$j] = $tmp;
-        }
-        mt_srand(); // reset seed
-        $options = collect($optionsArray);
 
         $adConfig = $this->adService->getAdConfig(auth()->user(), 'exam');
 
         return view('exam.take', [
             'session' => $session,
             'exam' => $session->exam,
-            'question' => $question,
-            'options' => $options,
+            'questionsData' => $questionsData,
             'currentIndex' => $currentIndex,
             'totalQuestions' => $session->total_questions,
             'questionOrder' => $questionOrder,
@@ -188,11 +212,16 @@ class ExamSessionController extends Controller
         }
 
         $updateData = [];
+        $isCorrect = null;
+        $correctOptionId = null;
+        $explanationTaglish = null;
 
         if (isset($validated['option_id'])) {
             // Check if option is correct
             $question = Question::with('correctOption')->find($validated['question_id']);
-            $isCorrect = $question->correctOption && $question->correctOption->id === (int) $validated['option_id'];
+            $correctOptionId = $question->correctOption?->id;
+            $explanationTaglish = $question->explanation_taglish;
+            $isCorrect = $correctOptionId && $correctOptionId === (int) $validated['option_id'];
 
             $updateData['selected_option_id'] = $validated['option_id'];
             $updateData['is_correct'] = $isCorrect;
@@ -209,7 +238,12 @@ class ExamSessionController extends Controller
 
         $answer->update($updateData);
 
-        return response()->json(['success' => true, 'answer' => $answer->fresh()]);
+        return response()->json([
+            'success' => true,
+            'is_correct' => $isCorrect,
+            'correct_option_id' => $correctOptionId,
+            'explanation_taglish' => $explanationTaglish,
+        ]);
     }
 
     /**
