@@ -8,7 +8,13 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('home');
+        $latestPosts = \App\Models\BlogPost::published()
+            ->with(['category', 'author'])
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        return view('home', compact('latestPosts'));
     }
 
     public function reviewers()

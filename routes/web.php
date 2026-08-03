@@ -16,9 +16,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ReportedQuestionController;
 use App\Http\Controllers\Admin\AdPopupController;
 use App\Http\Controllers\Admin\SubtopicController;
+use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\AdTrackingController;
 use App\Http\Controllers\SubjectPageController;
 use App\Http\Controllers\ExamSetupController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\SitemapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +33,14 @@ use App\Http\Controllers\ExamSetupController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/reviewers', [HomeController::class, 'reviewers'])->name('reviewers');
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
+// Blog / Study Guides
+Route::get('/study-guides', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/study-guides/category/{category}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/study-guides/{post}', [BlogController::class, 'show'])->name('blog.show');
+
+// Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Ad Tracking AJAX endpoints
 Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
@@ -96,6 +108,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
     // Subtopics CRUD
     Route::resource('subtopics', SubtopicController::class)->except(['show']);
+
+    // Blog Posts CRUD
+    Route::resource('blog', BlogPostController::class)->except(['show']);
+
+    // Blog Categories CRUD
+    Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
 
     // User Management
     Route::get('users', [UserController::class, 'index'])->name('users.index');

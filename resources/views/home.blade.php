@@ -320,27 +320,58 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @forelse(($latestPosts ?? collect()) as $post)
+                <a href="{{ route('blog.show', $post) }}" class="flat-card card overflow-hidden flex flex-col justify-between group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    @if($post->featured_image)
+                    <div class="h-40 overflow-hidden">
+                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    @endif
+                    <div class="p-6 flex-1">
+                        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3">
+                            <span class="text-blue-600 dark:text-blue-400 font-bold">{{ $post->category?->name ?? 'Guide' }}</span> • <span>{{ $post->reading_time }} min read</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-snug group-hover:text-blue-600 transition line-clamp-2">{{ $post->title }}</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">{{ $post->excerpt ?: Str::limit(strip_tags($post->body), 120) }}</p>
+                    </div>
+                    <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">By {{ $post->author?->name ?? 'Admin' }}</span>
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition flex items-center gap-1">
+                            Read Guide <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </a>
+                @empty
+                {{-- Fallback static cards when no blog posts exist --}}
                 @foreach([
-                    ['tag' => 'UPCAT Prep', 'tagColor' => 'text-blue-600 dark:text-blue-400', 'time' => '5 min read', 'title' => 'How to Master UPCAT Science & Math without Memorizing Formulas', 'desc' => 'Learn pattern recognition techniques and elimination strategies for tough UPCAT physics and algebra items.', 'author' => 'By Prof. Santos, UP Diliman'],
-                    ['tag' => 'Civil Service', 'tagColor' => 'text-amber-600 dark:text-amber-400', 'time' => '6 min read', 'title' => 'Top 5 Civil Service Math Shortcuts You Need for 2026 CSE', 'desc' => 'Solve work problems, percentage calculations, and age ratios in under 30 seconds per item.', 'author' => 'By CSE Topnotcher #1'],
-                    ['tag' => 'LET Board Exam', 'tagColor' => 'text-purple-600 dark:text-purple-400', 'time' => '7 min read', 'title' => "Understanding Bloom's Taxonomy & Assessment Principles in LET", 'desc' => 'Deconstruct situational questions in Professional Education with practical Taglish scenario analysis.', 'author' => 'By Dr. Cruz, LPT'],
+                    ['tag' => 'UPCAT Prep', 'time' => '5 min read', 'title' => 'How to Master UPCAT Science & Math without Memorizing Formulas', 'desc' => 'Learn pattern recognition techniques and elimination strategies for tough UPCAT physics and algebra items.', 'author' => 'By Prof. Santos, UP Diliman'],
+                    ['tag' => 'Civil Service', 'time' => '6 min read', 'title' => 'Top 5 Civil Service Math Shortcuts You Need for 2026 CSE', 'desc' => 'Solve work problems, percentage calculations, and age ratios in under 30 seconds per item.', 'author' => 'By CSE Topnotcher #1'],
+                    ['tag' => 'LET Board Exam', 'time' => '7 min read', 'title' => "Understanding Bloom's Taxonomy & Assessment Principles in LET", 'desc' => 'Deconstruct situational questions in Professional Education with practical Taglish scenario analysis.', 'author' => 'By Dr. Cruz, LPT'],
                 ] as $article)
                 <div class="flat-card card overflow-hidden flex flex-col justify-between">
                     <div class="p-6">
                         <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3">
-                            <span class="{{ $article['tagColor'] }} font-bold">{{ $article['tag'] }}</span> • <span>{{ $article['time'] }}</span>
+                            <span class="text-blue-600 dark:text-blue-400 font-bold">{{ $article['tag'] }}</span> • <span>{{ $article['time'] }}</span>
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-snug">{{ $article['title'] }}</h3>
                         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $article['desc'] }}</p>
                     </div>
                     <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
                         <span class="text-xs text-slate-500 dark:text-slate-400">{{ $article['author'] }}</span>
-                        <button class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition flex items-center gap-1">
+                        <a href="{{ route('blog.index') }}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition flex items-center gap-1">
                             Read Guide <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
                 @endforeach
+                @endforelse
+            </div>
+
+            {{-- View All CTA --}}
+            <div class="text-center mt-8">
+                <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-6 py-3 rounded-xl text-sm hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 transition">
+                    <i class="fa-solid fa-book-open"></i> View All Study Guides
+                </a>
             </div>
         </div>
     </section>

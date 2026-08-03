@@ -1,0 +1,16 @@
+[
+    {
+        "title_template": "Complete {exam} 2026 Study Guide: Tips, Syllabus & Reviewer",
+        "category_slug": "civil-service-tips",
+        "excerpt_template": "Everything you need to know to pass the {exam} exam in 2026. Download sample test questions and review strategies.",
+        "tags": ["reviewer", "study tips", "2026 exam"],
+        "body_template": "<h2>Overview of {exam} 2026</h2><p>Preparing for the {exam} requires dedicated study and structured strategy. In this guide, we break down essential topics and key practice questions to help you pass with flying colors.</p><h2>Core Topics to Focus On</h2><ul><li>Understanding item formats and timed constraints</li><li>Targeting weak subject areas using analytical practice drills</li><li>Mastering elimination techniques for tricky choices</li></ul><h2>Recommended Review Strategy</h2><p>Start your review by taking diagnostic tests to establish your baseline score. Focus heavily on areas where your accuracy is lowest before attempting full-length timed mock exams.</p>"
+    },
+    {
+        "title_template": "Top 7 Mistakes to Avoid When Preparing for the {exam}",
+        "category_slug": "general-study-tips",
+        "excerpt_template": "Avoid these common pitfalls when reviewing for the {exam}. Improve your review efficiency today.",
+        "tags": ["exam strategy", "time management", "study tips"],
+        "body_template": "<h2>Common Pitfalls in {exam} Preparation</h2><p>Many examinees fail not because of lack of effort, but due to inefficient study habits. Avoid these top mistakes to maximize your chance of success.</p><h2>1. Cramming at the Last Minute</h2><p>Spaced repetition and consistent daily practice are proven to be much more effective than marathon cramming sessions before the exam date.</p><h2>2. Ignoring Timed Practice</h2><p>Knowledge alone is not enough if you run out of time during the actual test. Practice under realistic time limits.</p>"
+    }
+]

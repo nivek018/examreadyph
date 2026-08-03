@@ -19,7 +19,7 @@
             <a href="{{ route('home') }}#how-it-works" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">How to Use</a>
             <a href="{{ route('pricing') }}" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Pricing</a>
             <a href="#community" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Community</a>
-            <a href="#blog" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Blog</a>
+            <a href="{{ route('blog.index') }}" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Study Guides</a>
         </nav>
 
         {{-- Right Controls --}}
@@ -87,7 +87,7 @@
         <a href="{{ route('home') }}#how-it-works" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">How to Use</a>
         <a href="{{ route('pricing') }}" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Pricing</a>
         <a href="#community" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Community</a>
-        <a href="#blog" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Blog</a>
+        <a href="{{ route('blog.index') }}" class="block text-slate-700 dark:text-slate-300 font-medium py-2 hover:text-blue-600 dark:hover:text-blue-400">Study Guides</a>
 
         @guest
             <div class="flex gap-3 pt-2">

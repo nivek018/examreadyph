@@ -60,6 +60,14 @@
                     <i class="fa-solid fa-rectangle-ad w-5 text-center text-amber-400"></i> Ad Campaigns
                 </a>
 
+                <a href="{{ route('admin.blog.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.blog.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+                    <i class="fa-solid fa-newspaper w-5 text-center text-emerald-400"></i> Blog Posts
+                </a>
+
+                <a href="{{ route('admin.blog-categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.blog-categories.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+                    <i class="fa-solid fa-folder-open w-5 text-center text-cyan-400"></i> Blog Categories
+                </a>
+
                 <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-3 mt-5 mb-2">Management</div>
 
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
