@@ -86,6 +86,63 @@
                 </button>
             </form>
         </div>
+
+        {{-- Auth Modal (shown when guest tries to start) --}}
+        <div x-show="showAuthModal" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+
+            {{-- Backdrop --}}
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showAuthModal = false"></div>
+
+            {{-- Modal Card --}}
+            <div class="relative w-full max-w-sm card flat-card p-8 text-center z-10"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+
+                {{-- Close button --}}
+                <button @click="showAuthModal = false" class="absolute top-3 right-3 w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                {{-- Icon --}}
+                <div class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-3xl mb-5 mx-auto">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+
+                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Create a Free Account</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                    Practice Mode tracks your weak topics over time so you know exactly what to study. Sign up in 30 seconds — it's <strong class="text-emerald-600 dark:text-emerald-400">100% free</strong>.
+                </p>
+
+                {{-- Sign up button --}}
+                <a href="{{ route('register') }}" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-6 py-3.5 rounded-lg transition shadow-lg flex items-center justify-center gap-2 mb-3">
+                    <i class="fa-solid fa-user-plus"></i> Sign Up Free
+                </a>
+
+                {{-- Login link --}}
+                <a href="{{ route('login') }}" class="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium">
+                    I have an account <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                </a>
+
+                {{-- Benefits list --}}
+                <div class="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700 text-left">
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">What you get:</p>
+                    <ul class="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Track weak subtopics over time</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Custom practice sessions saved</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Progress dashboard & stats</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> No payment required — ever</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </section>
 
     <script>
@@ -94,6 +151,7 @@
                 selectedSubtopics: [],
                 questionCount: 10,
                 customCount: 15,
+                showAuthModal: {{ session('showAuthModal') ? 'true' : 'false' }},
                 selectAll() {
                     this.selectedSubtopics = [
                         @foreach($subtopics as $st){{ $st->id }},@endforeach

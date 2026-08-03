@@ -36,12 +36,6 @@ class ExamSetupController extends Controller
     {
         if (!$exam->is_active) abort(404);
 
-        // Practice mode requires registration to track weak topics
-        if (!auth()->check()) {
-            return redirect()->route('register')
-                ->with('info', 'Practice Mode requires a free account so we can track your weak topics over time. Registration is 100% free!');
-        }
-
         $subtopics = $exam->activeSubtopics()->withCount(['questions' => function ($q) {
             $q->where('is_active', true);
         }])->get();
@@ -65,10 +59,11 @@ class ExamSetupController extends Controller
             $mode = 'mock';
         }
 
-        // Practice mode requires auth
+        // Practice mode requires auth — redirect back to show the signup modal
         if ($mode === 'practice' && !auth()->check()) {
-            return redirect()->route('register')
-                ->with('info', 'Practice Mode requires a free account to track your weak topics. Registration is 100% free!');
+            return redirect()->back()
+                ->withInput()
+                ->with('showAuthModal', true);
         }
 
         $user = auth()->user();

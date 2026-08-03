@@ -65,7 +65,7 @@
                     <span class="mt-auto bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-6 py-3 rounded-lg transition w-full flex items-center justify-center gap-2 shadow-sm">
                         <i class="fa-solid fa-bullseye"></i> Customize Practice
                     </span>
-                    <span class="badge-blue text-[9px] absolute top-4 right-4"><i class="fa-solid fa-user mr-0.5"></i> Account Required</span>
+                    <span class="badge-emerald text-[9px] absolute top-4 right-4">FREE</span>
                 </a>
             </div>
         </div>
