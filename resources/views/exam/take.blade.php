@@ -241,7 +241,7 @@
     <script>
         function examEngine() {
             return {
-                sessionId: {{ $session->id }},
+                sessionId: '{{ $session->uuid }}',
                 currentIndex: {{ $currentIndex }},
                 totalQuestions: {{ $totalQuestions }},
                 questionOrder: @json($questionOrder),

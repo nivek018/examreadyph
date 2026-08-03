@@ -196,6 +196,9 @@ class ExamSessionController extends Controller
         $index = min($validated['index'], $session->total_questions - 1);
         $session->update(['current_question_index' => $index]);
 
+        return response()->json(['success' => true, 'index' => $index]);
+    }
+
     /**
      * Report an issue with a question (AJAX).
      */
@@ -314,13 +317,10 @@ class ExamSessionController extends Controller
         ]);
     }
 
-    /**
-     * Ensure the logged-in user owns this session.
-     */
     protected function authorizeSession(ExamSession $session): void
     {
-        if ($session->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this exam session.');
+        if ($session->user_id !== auth()->id() && (!auth()->check() || !auth()->user()->isAdmin())) {
+            abort(403, 'Unauthorized access. You do not own this exam session.');
         }
     }
 }

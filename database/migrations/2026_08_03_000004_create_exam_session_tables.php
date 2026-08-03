@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('exam_sessions', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('exam_id')->constrained('exams')->cascadeOnDelete();
             $table->timestamp('started_at')->useCurrent();

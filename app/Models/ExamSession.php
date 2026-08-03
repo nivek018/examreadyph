@@ -9,11 +9,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ExamSession extends Model
 {
     protected $fillable = [
-        'user_id', 'exam_id', 'started_at', 'finished_at', 'expires_at',
+        'uuid', 'user_id', 'exam_id', 'started_at', 'finished_at', 'expires_at',
         'time_limit_seconds', 'current_question_index', 'status',
         'score', 'total_questions', 'correct_count', 'wrong_count',
         'unanswered_count', 'question_order_json',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (ExamSession $session) {
+            if (empty($session->uuid)) {
+                $session->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     protected function casts(): array
     {
