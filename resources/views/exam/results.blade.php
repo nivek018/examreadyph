@@ -292,8 +292,25 @@
                     }
                 },
 
-                explainAgain(qId, fullText) {
-                    this.startTypewriter(qId, fullText);
+                async explainAgain(qId, fullText) {
+                    if (this.typingTimers[qId]) clearInterval(this.typingTimers[qId]);
+                    this.typedTexts[qId] = { text: 'Thinking...', isDone: false, isGenerating: true };
+
+                    try {
+                        const res = await fetch(`/exam/session/${this.sessionId}/explain-question`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({ question_id: qId, force_regenerate: true }),
+                        });
+                        const data = await res.json();
+                        const text = (data.success && data.explanation) ? data.explanation : fullText;
+                        this.startTypewriter(qId, text);
+                    } catch(e) {
+                        this.startTypewriter(qId, fullText);
+                    }
                 },
 
                 startTypewriter(qId, fullText) {

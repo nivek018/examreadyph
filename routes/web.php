@@ -49,6 +49,7 @@ Route::get('/exam/session/{session}', [ExamSessionController::class, 'take'])->n
 Route::post('/exam/session/{session}/answer', [ExamSessionController::class, 'answer'])->name('exam.answer');
 Route::post('/exam/session/{session}/navigate', [ExamSessionController::class, 'navigate'])->name('exam.navigate');
 Route::post('/exam/session/{session}/report-question', [ExamSessionController::class, 'reportQuestion'])->name('exam.reportQuestion');
+Route::post('/exam/session/{session}/explain-question', [ExamSessionController::class, 'explainQuestion'])->name('exam.explainQuestion');
 Route::post('/exam/session/{session}/submit', [ExamSessionController::class, 'submit'])->name('exam.submit');
 Route::get('/exam/session/{session}/results', [ExamSessionController::class, 'results'])->name('exam.results');
 

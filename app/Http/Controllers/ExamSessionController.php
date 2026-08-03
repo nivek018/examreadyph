@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\ReportedQuestion;
 use App\Models\UserProgress;
 use App\Services\AdPopupService;
+use App\Services\AiExplanationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -290,6 +291,29 @@ class ExamSessionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Thank you! The issue has been reported to our moderation team.',
+        ]);
+    }
+
+    /**
+     * Generate or regenerate AI explanation for a question (AJAX).
+     */
+    public function explainQuestion(Request $request, ExamSession $session, AiExplanationService $aiService)
+    {
+        $this->authorizeSession($session);
+
+        $validated = $request->validate([
+            'question_id' => 'required|exists:questions,id',
+            'force_regenerate' => 'nullable|boolean',
+        ]);
+
+        $question = Question::with(['options', 'exam', 'subtopic'])->findOrFail($validated['question_id']);
+        $forceRegenerate = (bool) ($validated['force_regenerate'] ?? false);
+
+        $explanation = $aiService->explainQuestion($question, $forceRegenerate);
+
+        return response()->json([
+            'success' => true,
+            'explanation' => $explanation,
         ]);
     }
 
