@@ -16,6 +16,32 @@
                 @csrf
                 <input type="hidden" name="mode" value="practice">
 
+                {{-- Question Count --}}
+                <div class="card flat-card p-6 mb-6">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4">Number of Questions</h2>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach([5, 10, 20, 50] as $count)
+                        <button type="button" @click="questionCount = {{ $count }}"
+                                :class="questionCount === {{ $count }} ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'"
+                                class="px-5 py-2.5 rounded-lg text-sm font-bold border transition hover:border-blue-500">
+                            {{ $count }}
+                        </button>
+                        @endforeach
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="questionCount = customCount || 15"
+                                    :class="![5,10,20,50].includes(questionCount) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'"
+                                    class="px-4 py-2.5 rounded-lg text-sm font-bold border transition hover:border-blue-500">
+                                Custom
+                            </button>
+                            <input type="number" x-model.number="customCount" @input="questionCount = customCount"
+                                   min="1" max="500" placeholder="e.g. 15"
+                                   x-show="![5,10,20,50].includes(questionCount)"
+                                   class="w-20 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
+                        </div>
+                    </div>
+                    <input type="hidden" name="question_count" :value="questionCount">
+                </div>
+
                 {{-- Subtopic Selection --}}
                 <div class="card flat-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
@@ -45,32 +71,6 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">
                         <span class="font-semibold text-blue-600 dark:text-blue-400" x-text="selectedSubtopics.length"></span> of {{ $subtopics->count() }} subtopics selected
                     </p>
-                </div>
-
-                {{-- Question Count --}}
-                <div class="card flat-card p-6 mb-6">
-                    <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4">Number of Questions</h2>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach([5, 10, 20, 50] as $count)
-                        <button type="button" @click="questionCount = {{ $count }}"
-                                :class="questionCount === {{ $count }} ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'"
-                                class="px-5 py-2.5 rounded-lg text-sm font-bold border transition hover:border-blue-500">
-                            {{ $count }}
-                        </button>
-                        @endforeach
-                        <div class="flex items-center gap-2">
-                            <button type="button" @click="questionCount = customCount || 15"
-                                    :class="![5,10,20,50].includes(questionCount) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700'"
-                                    class="px-4 py-2.5 rounded-lg text-sm font-bold border transition hover:border-blue-500">
-                                Custom
-                            </button>
-                            <input type="number" x-model.number="customCount" @input="questionCount = customCount"
-                                   min="1" max="500" placeholder="e.g. 15"
-                                   x-show="![5,10,20,50].includes(questionCount)"
-                                   class="w-20 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
-                        </div>
-                    </div>
-                    <input type="hidden" name="question_count" :value="questionCount">
                 </div>
 
                 {{-- Sticky Submit Button --}}
