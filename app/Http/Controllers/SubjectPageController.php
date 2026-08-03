@@ -26,7 +26,7 @@ class SubjectPageController extends Controller
         $totalSessions = $exam->sessions()->where('status', 'completed')->count();
 
         // Build SEO title
-        $seoTitle = $exam->seo_title ?? "{$exam->name} Reviewer — Free Practice " . date('Y') . " | ExamReady PH";
+        $seoTitle = $exam->seo_title ?? "{$exam->name} Reviewer " . date('Y') . " — Free Practice Test | ExamReady PH";
         $seoDescription = $exam->seo_description ?? "Free {$exam->name} reviewer with answer key and AI Taglish explanations. Practice " . number_format($totalQuestions) . "+ questions across " . $subtopics->count() . " topics. No registration required for mock exams!";
 
         return view('exam.subject', [
@@ -54,7 +54,7 @@ class SubjectPageController extends Controller
             $q->where('is_active', true);
         }]);
 
-        $seoTitle = "{$subtopic->name} {$exam->name} Reviewer — Free Practice " . date('Y') . " | ExamReady PH";
+        $seoTitle = "{$subtopic->name} — {$exam->name} Reviewer " . date('Y') . " | ExamReady PH";
         $seoDescription = "Free {$subtopic->name} reviewer for {$exam->name}. Practice {$subtopic->questions_count}+ questions with instant AI Taglish answer explanations. Start reviewing now!";
 
         return view('exam.subtopic', [
