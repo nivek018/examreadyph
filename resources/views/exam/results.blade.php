@@ -159,7 +159,7 @@
                                 {{-- Explain Again Link --}}
                                 <button @click="explainAgain({{ $q->id }}, @js($q->explanation_taglish))"
                                         class="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 underline flex items-center gap-1 cursor-pointer">
-                                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Explain Again
+                                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Explain Again (+1 Credit)
                                 </button>
                             </div>
 
@@ -229,6 +229,7 @@
                 sessionId: config.sessionId,
                 isLoggedIn: config.isLoggedIn,
                 maxAllowed: config.maxAllowed,
+                creditsUsed: 0,
                 unlockedMap: {},
                 openMap: {},
                 cachedTexts: {},
@@ -238,13 +239,20 @@
 
                 init() {
                     try {
+                        const savedCredits = localStorage.getItem('ai_credits_' + this.sessionId);
                         const savedUnlocked = localStorage.getItem('ai_unlocked_' + this.sessionId);
                         const savedOpen = localStorage.getItem('ai_open_' + this.sessionId);
                         const savedCached = localStorage.getItem('ai_cached_' + this.sessionId);
 
+                        if (savedCredits) this.creditsUsed = parseInt(savedCredits, 10) || 0;
                         if (savedUnlocked) this.unlockedMap = JSON.parse(savedUnlocked);
                         if (savedOpen) this.openMap = JSON.parse(savedOpen);
                         if (savedCached) this.cachedTexts = JSON.parse(savedCached);
+
+                        const minUnlocked = Object.keys(this.unlockedMap).length;
+                        if (this.creditsUsed < minUnlocked) {
+                            this.creditsUsed = minUnlocked;
+                        }
 
                         Object.keys(this.unlockedMap).forEach(qId => {
                             if (this.cachedTexts[qId]) {
@@ -255,7 +263,7 @@
                 },
 
                 get unlockedCount() {
-                    return Object.keys(this.unlockedMap).length;
+                    return this.creditsUsed;
                 },
 
                 isUnlocked(qId) {
@@ -268,6 +276,7 @@
 
                 saveState() {
                     try {
+                        localStorage.setItem('ai_credits_' + this.sessionId, this.creditsUsed.toString());
                         localStorage.setItem('ai_unlocked_' + this.sessionId, JSON.stringify(this.unlockedMap));
                         localStorage.setItem('ai_open_' + this.sessionId, JSON.stringify(this.openMap));
                         localStorage.setItem('ai_cached_' + this.sessionId, JSON.stringify(this.cachedTexts));
@@ -319,12 +328,13 @@
                     }
 
                     if (!this.isUnlocked(qId)) {
-                        if (this.unlockedCount >= this.maxAllowed) {
+                        if (this.creditsUsed >= this.maxAllowed) {
                             this.showLimitModal = true;
                             return;
                         }
                         this.unlockedMap[qId] = true;
                         this.unlockedMap = { ...this.unlockedMap };
+                        this.creditsUsed++;
                     }
 
                     this.openMap[qId] = true;
@@ -341,6 +351,13 @@
                 },
 
                 explainAgain(qId, fallbackText) {
+                    if (this.creditsUsed >= this.maxAllowed) {
+                        this.showLimitModal = true;
+                        return;
+                    }
+                    this.creditsUsed++;
+                    this.saveState();
+
                     this.fetchExplanation(qId, fallbackText, true);
                 },
 
