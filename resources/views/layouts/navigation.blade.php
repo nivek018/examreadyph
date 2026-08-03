@@ -15,6 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user()->isAdmin())
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                        <span class="text-amber-600 font-bold"><i class="fa-solid fa-user-shield mr-1"></i> {{ __('Admin Panel') }}</span>
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -34,6 +39,11 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(Auth::user()->isAdmin())
+                        <x-dropdown-link :href="route('admin.dashboard')">
+                            <span class="text-amber-600 font-bold"><i class="fa-solid fa-user-shield mr-1"></i> {{ __('Admin Panel') }}</span>
+                        </x-dropdown-link>
+                        @endif
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>

@@ -34,5 +34,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed system settings
         $this->call(SystemSettingSeeder::class);
+
+        // Seed exam data
+        $this->call(ExamSeeder::class);
     }
 }

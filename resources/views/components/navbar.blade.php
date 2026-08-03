@@ -41,6 +41,11 @@
 
                     <div x-show="open" @click.away="open = false" x-transition
                          class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg py-2 z-50">
+                        @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-amber-600 dark:text-amber-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-700">
+                            <i class="fa-solid fa-user-shield mr-2 w-4"></i> Admin Panel
+                        </a>
+                        @endif
                         <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                             <i class="fa-solid fa-gauge-high mr-2 w-4"></i> Dashboard
                         </a>

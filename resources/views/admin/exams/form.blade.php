@@ -62,8 +62,8 @@
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Difficulty *</label>
                         <select name="difficulty" required class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition">
-                            @foreach(['easy' => 'Easy', 'medium' => 'Medium', 'hard' => 'Hard'] as $val => $label)
-                            <option value="{{ $val }}" {{ old('difficulty', $exam->difficulty ?? 'medium') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            @foreach(['beginner' => 'Beginner', 'intermediate' => 'Intermediate', 'advanced' => 'Advanced'] as $val => $label)
+                            <option value="{{ $val }}" {{ old('difficulty', $exam->difficulty ?? 'intermediate') === $val ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
