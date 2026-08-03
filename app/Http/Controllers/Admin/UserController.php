@@ -42,4 +42,25 @@ class UserController extends Controller
         $role = $user->role;
         return back()->with('success', "User {$user->name} role changed to {$role}.");
     }
+
+    public function toggleSubscription(User $user)
+    {
+        if ($user->isPremium()) {
+            // Cancel active subscription
+            $user->subscriptions()->where('status', 'active')->update(['status' => 'cancelled']);
+            return back()->with('success', "Pro subscription for {$user->name} has been revoked.");
+        } else {
+            // Grant 30 days Pro subscription
+            $plan = \App\Models\SubscriptionPlan::where('slug', 'pro-monthly')->first();
+            \App\Models\Subscription::create([
+                'user_id' => $user->id,
+                'plan_id' => $plan ? $plan->id : 1,
+                'starts_at' => now(),
+                'expires_at' => now()->addDays(30),
+                'status' => 'active',
+                'auto_renew' => false,
+            ]);
+            return back()->with('success', "Granted 30 days Pro subscription to {$user->name}.");
+        }
+    }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExamSessionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PricingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ExamCategoryController;
 use App\Http\Controllers\Admin\ExamController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\ReportedQuestionController;
+use App\Http\Controllers\Admin\AdPopupController;
+use App\Http\Controllers\AdTrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +25,11 @@ use App\Http\Controllers\Admin\ReportedQuestionController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/reviewers', [HomeController::class, 'reviewers'])->name('reviewers');
+Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
+// Ad Tracking AJAX endpoints
+Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
+Route::post('/ads/{ad}/click', [AdTrackingController::class, 'click'])->name('ads.click');
 
 /*
 |--------------------------------------------------------------------------
@@ -70,10 +78,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('reported-questions', [ReportedQuestionController::class, 'index'])->name('reported-questions.index');
     Route::post('reported-questions/{report}/resolve', [ReportedQuestionController::class, 'resolve'])->name('reported-questions.resolve');
 
+    // Ad Campaigns CRUD
+    Route::resource('ads', AdPopupController::class)->except(['show']);
+
     // User Management
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::post('users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggleBan');
     Route::post('users/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('users.makeAdmin');
+    Route::post('users/{user}/toggle-subscription', [UserController::class, 'toggleSubscription'])->name('users.toggleSubscription');
 
     // Settings
     Route::get('settings', [SettingsController::class, 'index'])->name('settings');

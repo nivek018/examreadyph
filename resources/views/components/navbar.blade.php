@@ -16,8 +16,8 @@
         {{-- Navigation Links (Desktop) --}}
         <nav class="hidden md:flex items-center gap-8">
             <a href="{{ route('home') }}#categories" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Reviewers</a>
+            <a href="{{ route('pricing') }}" class="text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-500 transition"><i class="fa-solid fa-crown mr-1"></i> Pricing</a>
             <a href="{{ route('home') }}#how-it-works" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Practice Tests</a>
-            <a href="{{ route('home') }}#articles" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Study Guides</a>
             <a href="{{ route('home') }}#faq" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a>
         </nav>
 

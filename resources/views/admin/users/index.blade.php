@@ -24,7 +24,7 @@
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
                     <th class="text-left px-5 py-3 text-xs font-bold text-slate-500 uppercase">User</th>
-                    <th class="text-center px-5 py-3 text-xs font-bold text-slate-500 uppercase">Role</th>
+                    <th class="text-center px-5 py-3 text-xs font-bold text-slate-500 uppercase">Plan</th>
                     <th class="text-center px-5 py-3 text-xs font-bold text-slate-500 uppercase">Status</th>
                     <th class="text-center px-5 py-3 text-xs font-bold text-slate-500 uppercase">Joined</th>
                     <th class="text-right px-5 py-3 text-xs font-bold text-slate-500 uppercase">Actions</th>
@@ -45,8 +45,10 @@
                     <td class="px-5 py-4 text-center">
                         @if($user->role === 'admin')
                             <span class="badge-purple text-[10px]">Admin</span>
+                        @elseif($user->isPremium())
+                            <span class="badge-amber text-[10px]"><i class="fa-solid fa-crown mr-1"></i> Pro Pass</span>
                         @else
-                            <span class="badge-blue text-[10px]">User</span>
+                            <span class="badge-blue text-[10px]">Free Plan</span>
                         @endif
                     </td>
                     <td class="px-5 py-4 text-center">
@@ -59,6 +61,16 @@
                     <td class="px-5 py-4 text-center text-xs text-slate-500">{{ $user->created_at->format('M d, Y') }}</td>
                     <td class="px-5 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
+                            {{-- Toggle Subscription --}}
+                            <form method="POST" action="{{ route('admin.users.toggleSubscription', $user) }}">
+                                @csrf
+                                <button class="text-xs font-medium {{ $user->isPremium() ? 'text-amber-600 hover:text-amber-500' : 'text-blue-600 hover:text-blue-500' }}">
+                                    <i class="fa-solid {{ $user->isPremium() ? 'fa-crown' : 'fa-plus-circle' }}"></i>
+                                    {{ $user->isPremium() ? 'Revoke Pro' : 'Grant Pro' }}
+                                </button>
+                            </form>
+
+                            {{-- Toggle Ban --}}
                             <form method="POST" action="{{ route('admin.users.toggleBan', $user) }}">
                                 @csrf
                                 <button class="text-xs font-medium {{ $user->is_banned ? 'text-emerald-600 hover:text-emerald-500' : 'text-rose-500 hover:text-rose-400' }}">

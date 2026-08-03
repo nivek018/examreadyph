@@ -233,6 +233,39 @@
         </div>
     </div>
 
+    {{-- Ad Popup Modal (Free Users Only / Configurable) --}}
+    @if(isset($adConfig) && $adConfig['enabled'])
+    <div x-show="showAdModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md" style="display: none;">
+        <div class="card p-5 max-w-lg w-full mx-4 relative overflow-hidden text-center border-2 border-amber-400 dark:border-amber-500 shadow-2xl">
+            {{-- Close Button --}}
+            <button @click="closeAd()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition flex items-center justify-center text-sm font-bold z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            {{-- Sponsored Label --}}
+            <div class="flex items-center justify-between mb-3 text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                <span class="flex items-center gap-1.5 text-amber-500"><i class="fa-solid fa-rectangle-ad"></i> Sponsored Partner Ad</span>
+                <span x-show="adDismissCountdown > 0" class="text-slate-400">Auto-close in <span x-text="adDismissCountdown" class="font-bold text-white"></span>s</span>
+            </div>
+
+            {{-- Ad Banner Image Link --}}
+            <template x-if="currentAd">
+                <a :href="currentAd.destination_url" target="_blank" @click="handleAdClick(currentAd.id)" class="block rounded-xl overflow-hidden group border border-slate-200 dark:border-slate-700 hover:border-amber-400 transition">
+                    <img :src="currentAd.image_url" :alt="currentAd.alt_text" class="w-full h-auto max-h-[320px] object-cover group-hover:scale-105 transition duration-300">
+                </a>
+            </template>
+
+            {{-- Upsell CTA --}}
+            <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <span class="text-slate-600 dark:text-slate-400 font-medium" x-text="adConfig.upgrade_cta_text"></span>
+                <a href="{{ route('pricing') }}" target="_blank" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-3 py-1.5 rounded-lg transition shrink-0 flex items-center gap-1">
+                    <i class="fa-solid fa-crown"></i> Go Premium
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Auto-submit form (hidden) --}}
     <form id="auto-submit-form" method="POST" action="{{ route('exam.submit', $session) }}" style="display: none;">
         @csrf
@@ -253,6 +286,16 @@
                 reportDescription: '',
                 reportSuccessMsg: '',
                 isReporting: false,
+
+                // Ad Engine State
+                adConfig: @json($adConfig ?? ['enabled' => false]),
+                showAdModal: false,
+                currentAd: null,
+                adPopupsShownCount: 0,
+                questionsAnsweredSinceLastAd: 0,
+                adDismissTimer: null,
+                adDismissCountdown: 0,
+
                 selectedOptionId: {{ $answers[$question->id]->selected_option_id ?? 'null' }},
                 isFlagged: {{ ($answers[$question->id]->is_flagged ?? false) ? 'true' : 'false' }},
 
@@ -297,6 +340,7 @@
                 },
 
                 async selectOption(optionId) {
+                    const wasAlreadyAnswered = this.selectedOptionId !== null;
                     this.selectedOptionId = optionId;
 
                     // Update local state
@@ -314,6 +358,61 @@
                             question_id: this.questionOrder[this.currentIndex],
                             option_id: optionId,
                         }),
+                    });
+
+                    // Trigger Ad logic on new answer
+                    if (!wasAlreadyAnswered) {
+                        this.questionsAnsweredSinceLastAd++;
+                        this.checkTriggerAd();
+                    }
+                },
+
+                checkTriggerAd() {
+                    if (!this.adConfig.enabled || !this.adConfig.ads || this.adConfig.ads.length === 0) return;
+                    if (this.adPopupsShownCount >= this.adConfig.max_per_session) return;
+
+                    if (this.questionsAnsweredSinceLastAd >= this.adConfig.show_after_questions) {
+                        this.triggerAd();
+                    }
+                },
+
+                triggerAd() {
+                    this.questionsAnsweredSinceLastAd = 0;
+                    this.adPopupsShownCount++;
+
+                    // Pick next ad round-robin
+                    const adIndex = (this.adPopupsShownCount - 1) % this.adConfig.ads.length;
+                    this.currentAd = this.adConfig.ads[adIndex];
+                    this.showAdModal = true;
+
+                    // Track impression
+                    fetch(`/ads/${this.currentAd.id}/impression`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                    });
+
+                    // Handle auto dismiss countdown
+                    if (this.adConfig.auto_dismiss_seconds > 0) {
+                        this.adDismissCountdown = this.adConfig.auto_dismiss_seconds;
+                        clearInterval(this.adDismissTimer);
+                        this.adDismissTimer = setInterval(() => {
+                            this.adDismissCountdown--;
+                            if (this.adDismissCountdown <= 0) {
+                                this.closeAd();
+                            }
+                        }, 1000);
+                    }
+                },
+
+                closeAd() {
+                    this.showAdModal = false;
+                    clearInterval(this.adDismissTimer);
+                },
+
+                handleAdClick(adId) {
+                    fetch(`/ads/${adId}/click`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
                     });
                 },
 

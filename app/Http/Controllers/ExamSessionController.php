@@ -8,11 +8,13 @@ use App\Models\ExamSession;
 use App\Models\Question;
 use App\Models\ReportedQuestion;
 use App\Models\UserProgress;
+use App\Services\AdPopupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ExamSessionController extends Controller
 {
+    public function __construct(protected AdPopupService $adService) {}
     /**
      * Start a new exam session or resume an existing one.
      */
@@ -119,6 +121,8 @@ class ExamSessionController extends Controller
             $options = $options->shuffle();
         }
 
+        $adConfig = $this->adService->getAdConfig(auth()->user(), 'exam');
+
         return view('exam.take', [
             'session' => $session,
             'exam' => $session->exam,
@@ -128,6 +132,7 @@ class ExamSessionController extends Controller
             'totalQuestions' => $session->total_questions,
             'questionOrder' => $questionOrder,
             'answers' => $answers,
+            'adConfig' => $adConfig,
         ]);
     }
 

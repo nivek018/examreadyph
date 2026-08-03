@@ -37,5 +37,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed exam data
         $this->call(ExamSeeder::class);
+
+        // Seed subscription pricing plans
+        $this->call(SubscriptionPlanSeeder::class);
     }
 }
