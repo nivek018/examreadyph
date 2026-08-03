@@ -194,9 +194,9 @@
                 </div>
 
                 {{-- Pro Tip Callout --}}
-                <div class="p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-slate-900 dark:text-slate-100">
-                    <div class="font-extrabold text-base mb-1.5 text-amber-700 dark:text-amber-400">ExamReady PH Pro Tip</div>
-                    <p class="text-base leading-relaxed">The Civil Service Exam does NOT allow calculators! All numerical computations must be solved by hand or mental math. Practicing speed computation techniques is crucial to finishing the exam on time.</p>
+                <div class="p-6 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-slate-900 dark:text-slate-100">
+                    <div class="font-extrabold text-lg mb-2 text-amber-700 dark:text-amber-400">ExamReady PH Pro Tip</div>
+                    <p class="text-base sm:text-lg leading-relaxed">The Civil Service Exam does NOT allow calculators! All numerical computations must be solved by hand or mental math. Practicing speed computation techniques is crucial to finishing the exam on time.</p>
                 </div>
 
                 {{-- Section 2: Coverage Breakdown --}}
@@ -208,37 +208,37 @@
                         The Professional Level test consists of 170 multiple-choice items divided into 5 major sub-tests. Here is the full breakdown of subjects covered:
                     </p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div class="card flat-card p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-500 transition">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-bold text-lg text-slate-900 dark:text-white">Numerical Reasoning</h4>
-                                <span class="badge-blue text-xs font-semibold">~35-40 items</span>
+                    <div class="space-y-4">
+                        <div class="card flat-card p-6 border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:border-blue-500 transition">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h4 class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white">Numerical Reasoning</h4>
+                                <span class="badge-blue text-xs font-semibold px-3 py-1 whitespace-nowrap">~35–40 items</span>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Word problems, percentages, ratio & proportion, number series, basic algebra, data interpretation, and speed math.</p>
+                            <p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed">Word problems, percentages, ratio & proportion, number series, basic algebra, data interpretation, and speed math.</p>
                         </div>
 
-                        <div class="card flat-card p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-purple-500 transition">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-bold text-lg text-slate-900 dark:text-white">Analytical Thinking</h4>
-                                <span class="badge-purple text-xs font-semibold">~30-35 items</span>
+                        <div class="card flat-card p-6 border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:border-purple-500 transition">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h4 class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white">Analytical Thinking</h4>
+                                <span class="badge-purple text-xs font-semibold px-3 py-1 whitespace-nowrap">~30–35 items</span>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Logic puzzles, syllogisms, pattern recognition, data sufficiency, and critical deductive reasoning.</p>
+                            <p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed">Logic puzzles, syllogisms, pattern recognition, data sufficiency, and critical deductive reasoning.</p>
                         </div>
 
-                        <div class="card flat-card p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-bold text-lg text-slate-900 dark:text-white">Verbal Ability</h4>
-                                <span class="badge-emerald text-xs font-semibold">~40-45 items</span>
+                        <div class="card flat-card p-6 border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:border-emerald-500 transition">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h4 class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white">Verbal Ability</h4>
+                                <span class="badge-emerald text-xs font-semibold px-3 py-1 whitespace-nowrap">~40–45 items</span>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">English & Filipino vocabulary, grammar and correct usage, sentence completion, paragraph organization, and reading comprehension.</p>
+                            <p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed">English & Filipino vocabulary, grammar and correct usage, sentence completion, paragraph organization, and reading comprehension.</p>
                         </div>
 
-                        <div class="card flat-card p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-500 transition">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-bold text-lg text-slate-900 dark:text-white">General Information & PH Constitution</h4>
-                                <span class="badge-amber text-xs font-semibold">~20-25 items</span>
+                        <div class="card flat-card p-6 border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:border-amber-500 transition">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h4 class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white">General Information & PH Constitution</h4>
+                                <span class="badge-amber text-xs font-semibold px-3 py-1 whitespace-nowrap">~20–25 items</span>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">1987 Philippine Constitution (Bill of Rights), RA 6713 (Code of Conduct for Public Officials), peace & human rights concepts, and environmental protection laws.</p>
+                            <p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed">1987 Philippine Constitution (Bill of Rights), RA 6713 (Code of Conduct for Public Officials), peace & human rights concepts, and environmental protection laws.</p>
                         </div>
                     </div>
                 </div>
