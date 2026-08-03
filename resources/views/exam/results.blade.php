@@ -136,9 +136,9 @@
                     </div>
 
                     {{-- AI Explanation Toggle Button --}}
-                    @if($q->explanation_taglish && $exam->show_explanations)
+                    @if($exam->show_explanations)
                     <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                        {{-- Hidden element storing raw explanation for localStorage persistence restoration --}}
+                        {{-- Hidden element storing raw explanation --}}
                         <div id="raw-exp-{{ $q->id }}" data-explanation="{{ $q->explanation_taglish }}" class="hidden"></div>
 
                         <button @click="toggleExplanation({{ $q->id }}, @js($q->explanation_taglish))"
@@ -153,7 +153,7 @@
                              class="mt-3 p-4 sm:p-5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-xs sm:text-sm">
                             <div class="flex items-center justify-between mb-2 pb-2 border-b border-purple-200/60 dark:border-purple-900/50">
                                 <div class="font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                                    <i class="fa-solid fa-robot text-purple-500"></i> AI Taglish Step-by-Step Explanation
+                                    <i class="fa-solid fa-robot text-purple-500"></i> AI Explanation
                                 </div>
                                 
                                 {{-- Explain Again Link --}}
@@ -189,7 +189,7 @@
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Guest Limit Reached (2/2)</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                            You have used your 2 free AI Taglish explanations as a guest taker. Create a free account to unlock <strong>50 AI explanations</strong> per session!
+                            You have used your 2 free AI explanations as a guest taker. Create a free account to unlock <strong>50 AI explanations</strong> per session!
                         </p>
                         <div class="space-y-2.5">
                             <a href="{{ route('register') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md block">
@@ -241,10 +241,6 @@
                         const savedOpen = localStorage.getItem('ai_open_' + this.sessionId);
                         if (savedUnlocked) {
                             this.unlockedMap = JSON.parse(savedUnlocked);
-                            Object.keys(this.unlockedMap).forEach(qId => {
-                                const fullText = document.getElementById('raw-exp-' + qId)?.dataset?.explanation || '';
-                                this.typedTexts[qId] = { text: fullText, isDone: true };
-                            });
                         }
                         if (savedOpen) {
                             this.openMap = JSON.parse(savedOpen);
@@ -271,7 +267,7 @@
                     } catch(e) {}
                 },
 
-                getTypedText(qId, fullText) {
+                getTypedText(qId, fallbackText) {
                     if (!this.typedTexts[qId]) return '';
                     let text = this.typedTexts[qId].text;
                     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -282,7 +278,28 @@
                     return this.typedTexts[qId] && !this.typedTexts[qId].isDone;
                 },
 
-                toggleExplanation(qId, fullText) {
+                async fetchExplanation(qId, fallbackText, forceRegenerate = false) {
+                    if (this.typingTimers[qId]) clearInterval(this.typingTimers[qId]);
+                    this.typedTexts[qId] = { text: 'Analyzing question and generating explanation...', isDone: false };
+
+                    try {
+                        const res = await fetch(`/exam/session/${this.sessionId}/explain-question`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({ question_id: qId, force_regenerate: forceRegenerate }),
+                        });
+                        const data = await res.json();
+                        const text = (data.success && data.explanation) ? data.explanation : fallbackText;
+                        this.startTypewriter(qId, text);
+                    } catch(e) {
+                        this.startTypewriter(qId, fallbackText);
+                    }
+                },
+
+                toggleExplanation(qId, fallbackText) {
                     if (this.isOpen(qId)) {
                         this.openMap[qId] = false;
                         this.openMap = { ...this.openMap };
@@ -303,30 +320,11 @@
                     this.openMap = { ...this.openMap };
                     this.saveState();
 
-                    if (!this.typedTexts[qId] || !this.typedTexts[qId].text) {
-                        this.startTypewriter(qId, fullText);
-                    }
+                    this.fetchExplanation(qId, fallbackText, false);
                 },
 
-                async explainAgain(qId, fullText) {
-                    if (this.typingTimers[qId]) clearInterval(this.typingTimers[qId]);
-                    this.typedTexts[qId] = { text: 'Analyzing question and generating explanation...', isDone: false, isGenerating: true };
-
-                    try {
-                        const res = await fetch(`/exam/session/${this.sessionId}/explain-question`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            },
-                            body: JSON.stringify({ question_id: qId, force_regenerate: true }),
-                        });
-                        const data = await res.json();
-                        const text = (data.success && data.explanation) ? data.explanation : fullText;
-                        this.startTypewriter(qId, text);
-                    } catch(e) {
-                        this.startTypewriter(qId, fullText);
-                    }
+                explainAgain(qId, fallbackText) {
+                    this.fetchExplanation(qId, fallbackText, true);
                 },
 
                 startTypewriter(qId, fullText) {

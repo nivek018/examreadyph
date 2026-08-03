@@ -197,10 +197,10 @@
                             <h3 class="text-base font-extrabold"
                                 :class="currentAnswerIsCorrect ? 'text-emerald-900 dark:text-emerald-300' : 'text-rose-900 dark:text-rose-300'"
                                 x-text="currentAnswerIsCorrect ? 'Tumpak! (Correct Answer)' : 'Mali! (Incorrect)'"></h3>
-                            <p class="text-xs font-semibold"
-                               :class="currentAnswerIsCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'">
-                                Taglish Explanation & Solution
-                            </p>
+                             <p class="text-xs font-semibold"
+                                :class="currentAnswerIsCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'">
+                                 AI Explanation & Solution
+                             </p>
                         </div>
                     </div>
 
