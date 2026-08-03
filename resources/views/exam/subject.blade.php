@@ -142,47 +142,300 @@
         </div>
     </section>
 
-    {{-- Article / About Section (SEO Content) --}}
-    <section class="py-14 border-b border-slate-200 dark:border-slate-800">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-8">
-                <p class="section-eyebrow">About This Reviewer</p>
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">{{ $exam->name }} — Study Guide & Overview</h2>
+    {{-- Article / About Section (SEO Study Guide) --}}
+    <section class="py-16 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="badge-blue text-xs mb-3 inline-block"><i class="fa-solid fa-book-open mr-1"></i> Official Exam Guide</span>
+                <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
+                    {{ $exam->name }} — Complete Study Guide & Coverage
+                </h2>
+                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-3 max-w-2xl mx-auto">
+                    Everything you need to know about the Civil Service Examination Professional Level: coverage, passing rate, tips, and free practice reviewers.
+                </p>
             </div>
 
-            <article class="prose prose-slate dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed">
-                @if($exam->long_description)
-                    {!! nl2br(e($exam->long_description)) !!}
-                @else
-                    <p>
-                        The <strong>{{ $exam->name }}</strong> is one of the most important exams for Filipino professionals and students.
-                        This free online reviewer from <strong>ExamReady PH</strong> covers <strong>{{ number_format($totalQuestions) }}+ practice questions</strong>
-                        across <strong>{{ $subtopics->count() }} key subtopics</strong> including:
+            {{-- Quick Spec Cards Grid --}}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+                <div class="card flat-card p-4 text-center bg-white dark:bg-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg mb-2 mx-auto">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">Passing Rating</div>
+                    <div class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">80.00%</div>
+                </div>
+
+                <div class="card flat-card p-4 text-center bg-white dark:bg-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg mb-2 mx-auto">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">Time Limit</div>
+                    <div class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">3h 10m (170 Qs)</div>
+                </div>
+
+                <div class="card flat-card p-4 text-center bg-white dark:bg-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg mb-2 mx-auto">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">Calculators</div>
+                    <div class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">Strictly Prohibited</div>
+                </div>
+
+                <div class="card flat-card p-4 text-center bg-white dark:bg-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg mb-2 mx-auto">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">Explanations</div>
+                    <div class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">Taglish AI Tutor</div>
+                </div>
+            </div>
+
+            {{-- Main Study Guide Article --}}
+            <div class="card flat-card p-6 sm:p-8 mb-12 space-y-8 bg-white dark:bg-slate-800/80">
+                {{-- Section 1 --}}
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-blue-600 dark:text-blue-400"></i>
+                        What is the Civil Service Exam Professional Level?
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                        The <strong>Civil Service Examination (CSE) Professional Level</strong> is a eligibility examination administered nationwide by the <strong>Civil Service Commission (CSC)</strong> in the Philippines. Passing this exam grants successful examinees the <strong>Career Service Professional Eligibility</strong>, which is a key requirement for permanent appointment to 2nd level positions in government agencies, national offices, and local government units (LGUs).
                     </p>
-                    <ul>
-                        @foreach($subtopics->take(6) as $st)
-                        <li><strong>{{ $st->name }}</strong> ({{ $st->questions_count }} questions)</li>
-                        @endforeach
-                        @if($subtopics->count() > 6)
-                        <li>...and {{ $subtopics->count() - 6 }} more topics</li>
-                        @endif
-                    </ul>
-                    <p>
-                        Our reviewer features <strong>AI-powered Taglish answer explanations</strong>, timed mock exams, and targeted practice drills.
-                        You can take free mock exams without an account, or register for free to unlock Practice Mode and track your weak areas over time.
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Positions that require Career Service Professional Eligibility include Administrative Officers, Information Officers, Statisticians, Economists, Program Analysts, and technical supervisory roles across government departments.
                     </p>
-                    <h3>How to Use This Reviewer</h3>
-                    <ol>
-                        <li><strong>Mock Exam:</strong> Take a full timed simulation with {{ $exam->total_questions }} questions in {{ $exam->formatted_time_limit }}. Best for realistic exam day preparation.</li>
-                        <li><strong>Relaxed Mode:</strong> Same questions, no timer. Read the AI Taglish explanations after each answer to really learn the material.</li>
-                        <li><strong>Practice Mode:</strong> Pick specific subtopics and choose how many questions (5, 10, 20, or 50). Perfect for targeting your weak areas.</li>
-                    </ol>
-                    <p>
-                        All questions are regularly updated and aligned with the latest {{ date('Y') }}-{{ date('Y') + 1 }} exam syllabus.
-                        Good luck on your review! 🎯
+                </div>
+
+                {{-- Pro Tip Callout --}}
+                <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border-l-4 border-blue-600 dark:border-blue-400 flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-blue-600 dark:text-blue-400 text-lg mt-0.5 flex-shrink-0"></i>
+                    <div class="text-xs sm:text-sm text-blue-950 dark:text-blue-200">
+                        <strong class="font-bold">ExamReady PH Tip:</strong> The Civil Service Exam does NOT allow calculators! All numerical computations must be solved by hand or mental math. Practicing speed computation techniques is crucial to finishing the exam on time.
+                    </div>
+                </div>
+
+                {{-- Section 2: Coverage Breakdown --}}
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-purple-600 dark:text-purple-400"></i>
+                        Detailed Subject Breakdown & Weight Distribution
+                    </h3>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-5">
+                        The Professional Level test consists of 170 multiple-choice items divided into 5 major sub-tests. Here is the full breakdown of subjects covered:
                     </p>
-                @endif
-            </article>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1 flex items-center justify-between">
+                                <span><i class="fa-solid fa-calculator text-blue-500 mr-2"></i>Numerical Reasoning</span>
+                                <span class="badge-blue text-[10px]">~35-40 items</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">Word problems, percentages, ratio & proportion, number series, basic algebra, data interpretation, and speed math.</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1 flex items-center justify-between">
+                                <span><i class="fa-solid fa-brain text-purple-500 mr-2"></i>Analytical Thinking</span>
+                                <span class="badge-purple text-[10px]">~30-35 items</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">Logic puzzles, syllogisms, pattern recognition, data sufficiency, and critical deductive reasoning.</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1 flex items-center justify-between">
+                                <span><i class="fa-solid fa-spell-check text-emerald-500 mr-2"></i>Verbal Ability</span>
+                                <span class="badge-emerald text-[10px]">~40-45 items</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">English & Filipino vocabulary, grammar and correct usage, sentence completion, paragraph organization, and reading comprehension.</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                            <div class="font-bold text-slate-900 dark:text-white text-sm mb-1 flex items-center justify-between">
+                                <span><i class="fa-solid fa-landmark text-amber-500 mr-2"></i>General Information & PH Constitution</span>
+                                <span class="badge-amber text-[10px]">~20-25 items</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">1987 Philippine Constitution (Bill of Rights), RA 6713 (Code of Conduct for Public Officials), peace & human rights concepts, and environmental protection laws.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 3: 5 Strategies --}}
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-amber-600 dark:text-amber-400"></i>
+                        5 Proven Strategies to Pass the Civil Service Exam on Your 1st Try
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Master Elimination & Estimation in Math</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Since calculators are forbidden, estimate answer choices before writing out lengthy equations. Eliminate options that are clearly out of range.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Prioritize High-Weight Subtopics First</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Verbal Ability and Numerical Reasoning make up over 50% of the total score. Focus your early review hours on these two categories using our targeted Practice Mode.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Memorize Key Provisions of RA 6713 & Bill of Rights</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">General Information items are easy points if you memorize the 8 Norms of Conduct under RA 6713 and Article III of the 1987 Philippine Constitution.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Simulate Real Exam Conditions with Timed Mock Exams</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">You have roughly 67 seconds per question in the actual test. Taking our online Mock Exam trains your pacing so you don't get stuck on difficult questions.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Learn from Mistakes via AI Taglish Answer Explanations</h4>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Don't just check if your answer is right or wrong. Read the step-by-step Taglish explanation after every practice question to understand *why* the option is correct.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Interactive FAQ Section --}}
+            <div class="mb-8" x-data="{ openFaq: null }">
+                <div class="text-center mb-8">
+                    <span class="badge-purple text-xs mb-2 inline-block"><i class="fa-solid fa-circle-question mr-1"></i> Common Questions</span>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Frequently Asked Questions (FAQ)</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Everything candidates ask about the Civil Service Exam Professional Level</p>
+                </div>
+
+                <div class="space-y-3">
+                    {{-- FAQ 1 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 1 ? null : 1" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>What is the passing score for the Civil Service Exam Professional Level?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 1 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 1" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            The official passing score for the Civil Service Examination (both Professional and Subprofessional levels) is <strong>80.00% General Rating</strong>. There is no individual passing score per subject, but you must reach an overall rating of 80% or higher to be declared eligible.
+                        </div>
+                    </div>
+
+                    {{-- FAQ 2 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 2 ? null : 2" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>How many items are in the actual CSE Professional Exam and what is the time limit?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 2 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 2" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            The Paper and Pencil Test (CSE-PPT) Professional Level consists of <strong>170 multiple-choice test items</strong> (150 exam core items + 20 examinee descriptive items) with a total time allotment of <strong>3 hours and 10 minutes (190 minutes)</strong>.
+                        </div>
+                    </div>
+
+                    {{-- FAQ 3 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 3 ? null : 3" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>Are calculators allowed during the Civil Service Examination?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 3 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 3" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            <strong>No, calculators are strictly prohibited</strong> during the Civil Service Exam according to CSC guidelines. Scratch papers are provided at the testing center for mental math computations.
+                        </div>
+                    </div>
+
+                    {{-- FAQ 4 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 4 ? null : 4" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>What is the difference between Professional and Subprofessional Level eligibility?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 4 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 4" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            <strong>Professional Eligibility</strong> qualifies you for both 1st level (clerical/custodial) and 2nd level (technical/supervisory/executive) government positions. <strong>Subprofessional Eligibility</strong> qualifies you ONLY for 1st level clerical positions. Bachelor's degree graduates are encouraged to take the Professional level directly.
+                        </div>
+                    </div>
+
+                    {{-- FAQ 5 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 5 ? null : 5" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>Is this online CSE reviewer 100% free?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 5 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 5" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            <strong>Yes, 100% free!</strong> On ExamReady PH, you can take unlimited timed Mock Exams and Relaxed Learning drills without paying a single cent. Creating a free account unlocks Practice Mode to filter specific subtopics and track weak areas over time.
+                        </div>
+                    </div>
+
+                    {{-- FAQ 6 --}}
+                    <div class="card flat-card overflow-hidden transition bg-white dark:bg-slate-800">
+                        <button @click="openFaq = openFaq === 6 ? null : 6" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                            <span>How do the AI Taglish explanations work?</span>
+                            <i class="fa-solid text-xs text-slate-400 transition-transform duration-200" :class="openFaq === 6 ? 'fa-minus rotate-180 text-blue-600' : 'fa-plus'"></i>
+                        </button>
+                        <div x-show="openFaq === 6" x-collapse class="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                            Every question in our database comes with a step-by-step answer explanation written in clear, conversational <strong>Taglish (Tagalog-English)</strong>. Instead of confusing textbook jargon, our explanations walk you through formulas, logic shortcuts, and grammar rules in a way that is easy to remember on exam day.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Schema.org JSON-LD Structured Data for Google rich snippets --}}
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What is the passing score for the Civil Service Exam Professional Level?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The official passing score for the Civil Service Examination (CSE) Professional Level is an 80.00% General Rating."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How many items are in the actual CSE Professional Exam and what is the time limit?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The CSE Professional Level paper-and-pencil test consists of 170 multiple-choice items with a total time allotment of 3 hours and 10 minutes."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Are calculators allowed during the Civil Service Examination?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No, calculators are strictly prohibited during the Civil Service Examination per Civil Service Commission rules."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What is the difference between Professional and Subprofessional Level eligibility?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Professional Eligibility qualifies you for 1st level (clerical) and 2nd level (technical/supervisory) government positions, whereas Subprofessional Level qualifies only for 1st level positions."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is this online CSE reviewer 100% free?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, ExamReady PH provides free online mock exams, practice drills, and AI Taglish explanations for Civil Service Exam takers."
+                  }
+                }
+              ]
+            }
+            </script>
         </div>
     </section>
 
