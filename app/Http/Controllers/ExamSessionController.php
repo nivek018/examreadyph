@@ -278,7 +278,7 @@ class ExamSessionController extends Controller
 
         ReportedQuestion::create([
             'question_id' => $validated['question_id'],
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id() ?? $session->user_id,
             'reason' => $validated['reason'],
             'description' => $validated['description'] ?? null,
             'status' => 'pending',
