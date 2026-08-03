@@ -13,14 +13,26 @@
 
     {{-- Top Bar Header --}}
     <header class="h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
-        {{-- Left Info --}}
+        {{-- Left Info: Logo + Exit Button + Exam Title --}}
         <div class="flex items-center gap-3 min-w-0">
-            <a href="{{ route('reviewer.show', $exam) }}" class="w-9 h-9 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 hover:bg-blue-600 hover:text-white transition">
-                <i class="fa-solid fa-graduation-cap"></i>
+            {{-- Brand Logo --}}
+            <a href="{{ route('home') }}" @click.prevent="showExitModal = true" class="flex items-center gap-2.5 group shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-lg shadow-sm">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span class="hidden sm:inline text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">ExamReady <span class="text-blue-500">PH</span></span>
             </a>
-            <div class="min-w-0">
+
+            <span class="text-slate-300 dark:text-slate-700">|</span>
+
+            {{-- Exit Link (Option A) --}}
+            <button @click="showExitModal = true" class="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition shrink-0">
+                <i class="fa-solid fa-arrow-left"></i> Exit Exam
+            </button>
+
+            <div class="min-w-0 hidden md:block border-l border-slate-200 dark:border-slate-800 pl-3">
                 <div class="flex items-center gap-2">
-                    <h1 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate">{{ $exam->name }}</h1>
+                    <h1 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">{{ $exam->name }}</h1>
                     @if(($session->mode ?? 'mock') === 'relaxed')
                         <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">Relaxed</span>
                     @elseif(($session->mode ?? 'mock') === 'practice')
@@ -29,8 +41,8 @@
                         <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">Mock</span>
                     @endif
                 </div>
-                {{-- Progress percentage bar under header --}}
-                <div class="w-32 sm:w-48 bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                {{-- Progress percentage bar --}}
+                <div class="w-32 bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
                     <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300" :style="'width: ' + progressPercent + '%'"></div>
                 </div>
             </div>
@@ -58,10 +70,9 @@
                 <span x-text="answeredCount + '/' + {{ $totalQuestions }}"></span>
             </button>
 
-            {{-- Submit Exam Button --}}
-            <button @click="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition shadow-sm hover:shadow flex items-center gap-1.5">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Submit</span>
+            {{-- Submit Exam Button (Icon Removed) --}}
+            <button @click="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition shadow-sm hover:shadow">
+                Submit
             </button>
         </div>
     </header>
@@ -96,7 +107,7 @@
             </div>
         </aside>
 
-        {{-- Mobile Navigator Drawer (Slide down) --}}
+        {{-- Mobile Navigator Drawer --}}
         <div x-show="showMobileNav" x-cloak x-transition
              class="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-16 z-20 shadow-xl">
             <div class="flex items-center justify-between mb-3">
@@ -211,22 +222,63 @@
                     <span x-text="currentIndex + 1"></span> / {{ $totalQuestions }}
                 </div>
 
-                <button @click="nextQuestion()" :disabled="currentIndex >= {{ $totalQuestions - 1 }}"
-                        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition shadow-md disabled:opacity-30 disabled:cursor-not-allowed">
-                    Next <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                {{-- Show Next on questions 1 to N-1, Show Finish on last question --}}
+                <template x-if="currentIndex < totalQuestions - 1">
+                    <button @click="nextQuestion()"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition shadow-md">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </template>
+
+                <template x-if="currentIndex === totalQuestions - 1">
+                    <button @click="confirmSubmit()"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-md">
+                        <span>Finish & View Results</span> <i class="fa-solid fa-check"></i>
+                    </button>
+                </template>
             </div>
 
         </main>
     </div>
 
+    {{-- Exit Confirmation Modal --}}
+    <div x-show="showExitModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="card flat-card p-6 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" @click.outside="showExitModal = false">
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Exit Exam Session?</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                Your progress is saved automatically. You can resume this session anytime from your dashboard.
+            </p>
+            <div class="space-y-2.5">
+                <a href="{{ route('reviewer.show', $exam) }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Exit to Subject Page
+                </a>
+                <a href="{{ route('home') }}" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-house"></i> Exit to Homepage
+                </a>
+                <button @click="showExitModal = false" class="w-full text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-semibold text-xs py-2 transition">
+                    Keep Reviewing
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- Submit Confirmation Modal --}}
     <div x-show="showSubmitModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="card flat-card p-6 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800" @click.outside="showSubmitModal = false">
-            <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl mb-4">
-                <i class="fa-solid fa-paper-plane"></i>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-trophy"></i>
             </div>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Submit Exam Session?</h3>
+
+            <template x-if="answeredCount === totalQuestions">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">All Questions Answered! 🎉</h3>
+            </template>
+            <template x-if="answeredCount < totalQuestions">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Submit Exam Session?</h3>
+            </template>
+
             <div class="space-y-2 mb-6 text-sm text-slate-600 dark:text-slate-400">
                 <p>You have answered <strong class="text-slate-900 dark:text-white" x-text="answeredCount"></strong> out of <strong class="text-slate-900 dark:text-white">{{ $totalQuestions }}</strong> questions.</p>
                 <template x-if="unansweredCount > 0">
@@ -244,7 +296,7 @@
                 <form method="POST" action="{{ route('exam.submit', $session) }}" class="flex-1">
                     @csrf
                     <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check"></i> Yes, Submit Now
+                        View Results & Score
                     </button>
                 </form>
                 <button @click="showSubmitModal = false" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition">
@@ -347,6 +399,7 @@
                 remainingSeconds: {{ $session->remaining_seconds }},
                 timerWarning: false,
                 showSubmitModal: false,
+                showExitModal: false,
                 showReportModal: false,
                 showMobileNav: false,
                 reportReason: 'incorrect_answer',
@@ -423,12 +476,11 @@
                 },
 
                 async selectOption(optionId) {
-                    if (this.mode !== 'mock' && this.isCurrentAnswered) return; // Prevent changing in Relaxed/Practice
+                    if (this.mode !== 'mock' && this.isCurrentAnswered) return;
 
                     const qId = this.currentQuestion.id;
                     const wasAlreadyAnswered = this.isCurrentAnswered;
 
-                    // Instantly set local state (SPA speed!)
                     const selectedOpt = (this.currentQuestion.options || []).find(o => o.id === optionId);
                     const isCorrect = selectedOpt ? selectedOpt.is_correct : null;
 
@@ -438,7 +490,7 @@
                     this.userAnswers[qId].optionId = optionId;
                     this.userAnswers[qId].isCorrect = isCorrect;
 
-                    // Background AJAX persist to backend
+                    // Background AJAX persist
                     fetch(`/exam/session/${this.sessionId}/answer`, {
                         method: 'POST',
                         headers: {
@@ -447,6 +499,11 @@
                         },
                         body: JSON.stringify({ question_id: qId, option_id: optionId }),
                     });
+
+                    // Trigger submit modal automatically if all questions are now answered
+                    if (this.answeredCount === this.totalQuestions) {
+                        setTimeout(() => { this.showSubmitModal = true; }, 600);
+                    }
 
                     if (!wasAlreadyAnswered) {
                         this.questionsAnsweredSinceLastAd++;
@@ -474,7 +531,6 @@
                 goToQuestion(index) {
                     if (index >= 0 && index < this.totalQuestions) {
                         this.currentIndex = index;
-                        // Silent background sync
                         fetch(`/exam/session/${this.sessionId}/navigate`, {
                             method: 'POST',
                             headers: {
