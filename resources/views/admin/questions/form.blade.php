@@ -28,11 +28,21 @@
 
                     {{-- Section --}}
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Section Name</label>
-                        <input type="text" name="section_name" value="{{ old('section_name', $question->section_name) }}"
-                               class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition"
-                               placeholder="e.g., General Information, Numerical Reasoning">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Subtopic</label>
+                        <select name="subtopic_id" class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="">No subtopic</option>
+                            @foreach($subtopics as $subtopic)
+                            <option value="{{ $subtopic->id }}" data-exam="{{ $subtopic->exam_id }}" {{ old('subtopic_id', $question->subtopic_id) == $subtopic->id ? 'selected' : '' }}>{{ $subtopic->name }} ({{ $subtopic->exam->name ?? '' }})</option>
+                            @endforeach
+                        </select>
                     </div>
+                </div>
+
+                <div class="mt-5">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Section Name <span class="text-xs text-slate-400">(Legacy, optional)</span></label>
+                    <input type="text" name="section_name" value="{{ old('section_name', $question->section_name) }}"
+                           class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition"
+                           placeholder="e.g., General Information, Numerical Reasoning">
                 </div>
 
                 {{-- Question Text --}}

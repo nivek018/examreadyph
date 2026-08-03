@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionOption;
+use App\Models\Subtopic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,11 +38,13 @@ class QuestionController extends Controller
     {
         $exams = Exam::with('category')->orderBy('name')->get();
         $selectedExamId = $request->get('exam_id');
+        $subtopics = Subtopic::where('is_active', true)->orderBy('exam_id')->orderBy('sort_order')->get();
 
         return view('admin.questions.form', [
             'question' => new Question(),
             'exams' => $exams,
             'selectedExamId' => $selectedExamId,
+            'subtopics' => $subtopics,
         ]);
     }
 
@@ -49,6 +52,7 @@ class QuestionController extends Controller
     {
         $validated = $request->validate([
             'exam_id' => 'required|exists:exams,id',
+            'subtopic_id' => 'nullable|exists:subtopics,id',
             'section_name' => 'nullable|string|max:255',
             'question_text' => 'required|string',
             'explanation_taglish' => 'nullable|string',
@@ -64,6 +68,7 @@ class QuestionController extends Controller
         DB::transaction(function () use ($request, $validated) {
             $question = Question::create([
                 'exam_id' => $validated['exam_id'],
+                'subtopic_id' => $validated['subtopic_id'] ?? null,
                 'section_name' => $validated['section_name'] ?? null,
                 'question_text' => $validated['question_text'],
                 'explanation_taglish' => $validated['explanation_taglish'] ?? null,
@@ -92,11 +97,13 @@ class QuestionController extends Controller
     {
         $question->load('options');
         $exams = Exam::with('category')->orderBy('name')->get();
+        $subtopics = Subtopic::where('is_active', true)->orderBy('exam_id')->orderBy('sort_order')->get();
 
         return view('admin.questions.form', [
             'question' => $question,
             'exams' => $exams,
             'selectedExamId' => $question->exam_id,
+            'subtopics' => $subtopics,
         ]);
     }
 
@@ -104,6 +111,7 @@ class QuestionController extends Controller
     {
         $validated = $request->validate([
             'exam_id' => 'required|exists:exams,id',
+            'subtopic_id' => 'nullable|exists:subtopics,id',
             'section_name' => 'nullable|string|max:255',
             'question_text' => 'required|string',
             'explanation_taglish' => 'nullable|string',
@@ -119,6 +127,7 @@ class QuestionController extends Controller
         DB::transaction(function () use ($request, $validated, $question) {
             $question->update([
                 'exam_id' => $validated['exam_id'],
+                'subtopic_id' => $validated['subtopic_id'] ?? null,
                 'section_name' => $validated['section_name'] ?? null,
                 'question_text' => $validated['question_text'],
                 'explanation_taglish' => $validated['explanation_taglish'] ?? null,
