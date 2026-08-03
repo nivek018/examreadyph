@@ -4,6 +4,7 @@
 >
     <section class="py-10 bg-slate-50/50 dark:bg-slate-950/50 min-h-screen"
              x-data="resultsManager({
+                 sessionId: '{{ $session->uuid }}',
                  isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
                  maxAllowed: {{ auth()->check() ? (auth()->user()->is_premium ? 9999 : 50) : 2 }}
              })">
@@ -137,6 +138,9 @@
                     {{-- AI Explanation Toggle Button --}}
                     @if($q->explanation_taglish && $exam->show_explanations)
                     <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        {{-- Hidden element storing raw explanation for localStorage persistence restoration --}}
+                        <div id="raw-exp-{{ $q->id }}" data-explanation="{{ $q->explanation_taglish }}" class="hidden"></div>
+
                         <button @click="toggleExplanation({{ $q->id }}, @js($q->explanation_taglish))"
                                 class="text-xs font-bold px-3.5 py-2 rounded-xl border transition flex items-center gap-2 cursor-pointer"
                                 :class="isRevealed({{ $q->id }}) ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/70 hover:bg-purple-100 dark:hover:bg-purple-900/60'">
@@ -222,6 +226,7 @@
     <script>
         function resultsManager(config) {
             return {
+                sessionId: config.sessionId,
                 isLoggedIn: config.isLoggedIn,
                 maxAllowed: config.maxAllowed,
                 revealedMap: {},
@@ -229,12 +234,31 @@
                 typingTimers: {},
                 showLimitModal: false,
 
+                init() {
+                    try {
+                        const saved = localStorage.getItem('ai_revealed_' + this.sessionId);
+                        if (saved) {
+                            this.revealedMap = JSON.parse(saved);
+                            Object.keys(this.revealedMap).forEach(qId => {
+                                const fullText = document.getElementById('raw-exp-' + qId)?.dataset?.explanation || '';
+                                this.typedTexts[qId] = { text: fullText, isDone: true };
+                            });
+                        }
+                    } catch(e) {}
+                },
+
                 get revealedCount() {
                     return Object.keys(this.revealedMap).length;
                 },
 
                 isRevealed(qId) {
                     return !!this.revealedMap[qId];
+                },
+
+                saveState() {
+                    try {
+                        localStorage.setItem('ai_revealed_' + this.sessionId, JSON.stringify(this.revealedMap));
+                    } catch(e) {}
                 },
 
                 getTypedText(qId, fullText) {
@@ -250,6 +274,7 @@
                     if (this.revealedMap[qId]) {
                         delete this.revealedMap[qId];
                         this.revealedMap = { ...this.revealedMap };
+                        this.saveState();
                         return;
                     }
 
@@ -260,6 +285,7 @@
 
                     this.revealedMap[qId] = true;
                     this.revealedMap = { ...this.revealedMap };
+                    this.saveState();
 
                     if (!this.typedTexts[qId] || !this.typedTexts[qId].text) {
                         this.startTypewriter(qId, fullText);
