@@ -229,13 +229,11 @@
                                                     {{ strtoupper(substr($child->user->name ?? 'A', 0, 1)) }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center justify-between gap-2 mb-1">
-                                                        <div class="flex items-center gap-2">
-                                                            <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $child->user->name ?? 'Anonymous' }}</span>
-                                                            <span class="text-[10px] text-slate-400">{{ $child->formatted_date }}</span>
-                                                        </div>
-                                                        {{-- Child Reply Report on Hover --}}
-                                                        <button type="button" onclick="toggleReplyBox('report-reply-{{ $child->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity" title="Report comment">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $child->user->name ?? 'Anonymous' }}</span>
+                                                        <span class="text-[10px] text-slate-400">{{ $child->formatted_date }}</span>
+                                                        {{-- Child Reply Report on Hover (Inline next to date) --}}
+                                                        <button type="button" onclick="toggleReplyBox('report-reply-{{ $child->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity ml-1" title="Report comment">
                                                             <i class="fa-solid fa-flag text-[10px]"></i>
                                                         </button>
                                                     </div>
