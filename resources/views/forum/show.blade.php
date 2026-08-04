@@ -251,7 +251,7 @@
                         <p class="text-xs text-slate-300 leading-relaxed font-normal mb-5">
                             Take timed practice drills with step-by-step Taglish AI explanations tailored to your target exam.
                         </p>
-                        <a href="{{ route('reviewers') }}" class="block w-full text-center bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition shadow-md active:scale-95">
+                        <a href="{{ route('reviewers') }}" class="block w-full text-center bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition shadow-md active:scale-95">
                             Start Free Practice Drill
                         </a>
                     </div>
