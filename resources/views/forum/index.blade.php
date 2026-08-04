@@ -126,8 +126,8 @@
                         </div>
                     </div>
 
-                    {{-- Exam Prep Callout (Light & Dark Mode Adaptive Emerald Theme) --}}
-                    <div class="card p-6 bg-emerald-50/80 dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 rounded-2xl shadow-sm">
+                    {{-- Exam Prep Callout (Light & Dark Mode Matching Card Theme) --}}
+                    <div class="card flat-card p-6 bg-emerald-50/60 dark:bg-slate-800 border border-emerald-200/80 dark:border-slate-700 rounded-2xl shadow-sm">
                         <h3 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mb-2">
                             Test Your Exam Readiness
                         </h3>
