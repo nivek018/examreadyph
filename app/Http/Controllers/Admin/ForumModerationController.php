@@ -41,21 +41,26 @@ class ForumModerationController extends Controller
     }
 
     /**
-     * Resolve a report (mark content as actioned).
+     * Resolve a report (mark content as spam & hide from public view).
      */
     public function resolve(ForumReport $report)
     {
+        // Automatically hide reported content from public view when resolved
+        if ($report->reportable) {
+            $report->reportable->update(['is_spam' => true]);
+        }
+
         $report->update([
             'status' => 'resolved',
             'resolved_by' => auth()->id(),
             'resolved_at' => now(),
         ]);
 
-        return back()->with('success', 'Report resolved.');
+        return back()->with('success', 'Report resolved and content hidden from public view.');
     }
 
     /**
-     * Dismiss a report (no action needed).
+     * Dismiss a report (keep content active, no penalty).
      */
     public function dismiss(ForumReport $report)
     {
@@ -65,7 +70,7 @@ class ForumModerationController extends Controller
             'resolved_at' => now(),
         ]);
 
-        return back()->with('success', 'Report dismissed.');
+        return back()->with('success', 'Report dismissed (content remains active).');
     }
 
     /**
