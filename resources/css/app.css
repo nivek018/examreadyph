@@ -48,13 +48,9 @@
 
 /* ===== Component Styles ===== */
 @layer components {
-    /* Flat card with subtle hover */
+    /* Flat card without jumpy hover movement */
     .flat-card {
-        @apply transition-all duration-150 ease-in-out;
-    }
-
-    .flat-card:hover {
-        @apply -translate-y-0.5;
+        @apply transition-colors duration-150 ease-in-out;
     }
 
     /* Tab button active state */

@@ -126,15 +126,15 @@
                         </div>
                     </div>
 
-                    {{-- Exam Prep Callout (Light & Dark Mode Adaptive) --}}
-                    <div class="card flat-card p-6 bg-blue-50/70 dark:bg-slate-900 border border-blue-200/80 dark:border-slate-800 rounded-2xl shadow-sm">
+                    {{-- Exam Prep Callout (Light & Dark Mode Adaptive Emerald Theme) --}}
+                    <div class="card p-6 bg-emerald-50/80 dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 rounded-2xl shadow-sm">
                         <h3 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mb-2">
                             Test Your Exam Readiness
                         </h3>
                         <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal mb-5">
                             Take timed practice drills with step-by-step Taglish AI explanations tailored to your target exam.
                         </p>
-                        <a href="{{ route('reviewers') }}" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-4 rounded-xl transition shadow-sm active:scale-95">
+                        <a href="{{ route('reviewers') }}" class="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 px-4 rounded-xl transition shadow-sm active:scale-95">
                             Start Free Practice Drill
                         </a>
                     </div>
