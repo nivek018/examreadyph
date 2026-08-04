@@ -16,7 +16,7 @@
                     <span class="text-slate-700 dark:text-slate-300 font-medium truncate max-w-[180px] sm:max-w-[300px]">{{ $thread->title }}</span>
                 </nav>
 
-                <a href="#reply-box" class="hidden sm:inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm">
+                <a href="#replies-feed" class="hidden sm:inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm">
                     <i class="fa-solid fa-reply"></i> Reply
                 </a>
             </div>
@@ -94,20 +94,22 @@
                             {{-- Bottom Actions Bar --}}
                             <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs text-slate-500">
                                 <div class="flex items-center gap-3">
-                                    <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg font-medium">
-                                        <i class="fa-solid fa-share-nodes"></i> Share Discussion
+                                    <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95">
+                                        <i class="fa-solid fa-share-nodes text-blue-500"></i> Share Discussion
                                     </button>
-                                    <span id="copied-toast" class="hidden text-emerald-600 font-semibold transition">Copied to clipboard!</span>
+                                    <span id="copied-toast" class="hidden text-emerald-600 font-bold transition flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                                        <i class="fa-solid fa-circle-check text-xs"></i> Link copied!
+                                    </span>
                                 </div>
-                                <a href="#reply-box" class="text-blue-600 font-bold hover:underline flex items-center gap-1">
-                                    <i class="fa-solid fa-arrow-down text-[10px]"></i> Jump to Comments
-                                </a>
+                                <button type="button" onclick="scrollToComments()" class="text-blue-600 font-bold hover:underline flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-arrow-down-long text-xs"></i> Jump to Comments
+                                </button>
                             </div>
                         </div>
                     </article>
 
                     {{-- Replies Feed Section --}}
-                    <div class="space-y-4">
+                    <div class="space-y-4" id="replies-feed">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                 <i class="fa-solid fa-comments text-blue-500"></i>
@@ -293,7 +295,7 @@
 
                     {{-- Practice Exam Widget --}}
                     <div class="card flat-card p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
-                        <span class="text-xl mb-1 block">🎯</span>
+                        <i class="fa-solid fa-bullseye text-blue-200 text-2xl mb-2 block"></i>
                         <h3 class="font-bold text-white text-sm mb-1">Test Your Knowledge</h3>
                         <p class="text-xs text-blue-100 mb-4 leading-relaxed">
                             Practice with real exam questions and get instant AI rationales.
@@ -347,8 +349,35 @@
             if (el) el.classList.toggle('hidden');
         }
 
+        function scrollToComments() {
+            const target = document.getElementById('replies-feed');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
         function copyThreadUrl() {
-            navigator.clipboard.writeText(window.location.href);
+            const url = window.location.href;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(showCopyToast);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = url;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopyToast();
+                } catch (err) {
+                    console.error('Copy failed', err);
+                }
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function showCopyToast() {
             const toast = document.getElementById('copied-toast');
             if (toast) {
                 toast.classList.remove('hidden');

@@ -232,7 +232,7 @@
                 {{-- Practice Exam CTA --}}
                 <div class="card flat-card p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
                     <div class="relative z-10">
-                        <span class="text-xl mb-1 block">💡</span>
+                        <i class="fa-solid fa-lightbulb text-blue-200 text-2xl mb-2 block"></i>
                         <h3 class="font-bold text-white text-base mb-1">Boost Your Review</h3>
                         <p class="text-xs text-blue-100 mb-4 leading-relaxed">
                             Take timed mock exams with instant AI explanations tailored to your subject.
@@ -249,9 +249,9 @@
                         <i class="fa-solid fa-shield-halved text-emerald-500"></i> Community Code
                     </h4>
                     <ul class="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-                        <li class="flex items-start gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Be helpful and constructive.</li>
-                        <li class="flex items-start gap-1.5"><span class="text-emerald-500 font-bold">✓</span> No posting of unverified exam leaks.</li>
-                        <li class="flex items-start gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Keep discussions exam-focused.</li>
+                        <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-500 text-xs mt-0.5"></i> Be helpful and constructive.</li>
+                        <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-500 text-xs mt-0.5"></i> No posting of unverified exam leaks.</li>
+                        <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-500 text-xs mt-0.5"></i> Keep discussions exam-focused.</li>
                     </ul>
                 </div>
             </aside>
