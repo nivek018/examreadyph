@@ -33,7 +33,7 @@
                 {{-- Authenticated User Menu --}}
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white transition">
-                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-7 h-7 rounded-full object-cover bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-7 h-7 rounded-full object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700">
                         <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
                         <i class="fa-solid fa-chevron-down text-xs"></i>
                     </button>
