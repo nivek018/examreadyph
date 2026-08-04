@@ -479,11 +479,19 @@
                         countSpan.innerText = data.upvotes_count;
                     }
                     if (data.upvoted) {
+                        btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'text-slate-600', 'dark:text-slate-300');
                         btn.classList.add('bg-blue-600', 'text-white');
-                        btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                        if (countSpan && countSpan.classList.contains('rounded-full')) {
+                            countSpan.classList.remove('bg-slate-200', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
+                            countSpan.classList.add('bg-white/20', 'text-white');
+                        }
                     } else {
                         btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('bg-slate-100', 'text-slate-700');
+                        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+                        if (countSpan && countSpan.classList.contains('rounded-full')) {
+                            countSpan.classList.remove('bg-white/20', 'text-white');
+                            countSpan.classList.add('bg-slate-200', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
+                        }
                     }
                 }
             })

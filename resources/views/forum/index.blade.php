@@ -240,11 +240,11 @@
                         countSpan.innerText = data.upvotes_count;
                     }
                     if (data.upvoted) {
+                        btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
                         btn.classList.add('bg-blue-600', 'text-white');
-                        btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
                     } else {
                         btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('bg-slate-100', 'text-slate-600');
+                        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
                     }
                 }
             })
