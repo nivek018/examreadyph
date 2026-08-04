@@ -230,6 +230,14 @@ class ForumController extends Controller
      */
     public function toggleUpvote(Request $request, string $type, int $id)
     {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'redirect' => route('login'),
+                'message' => 'Please sign in to upvote.',
+            ], 401);
+        }
+
         $upvotableClass = $type === 'thread'
             ? ForumThread::class
             : ForumReply::class;
@@ -260,14 +268,10 @@ class ForumController extends Controller
 
         $item->update(['upvotes_count' => $count]);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'upvoted' => $upvoted,
-                'upvotes_count' => $count,
-            ]);
-        }
-
-        return back();
+        return response()->json([
+            'success' => true,
+            'upvoted' => $upvoted,
+            'upvotes_count' => $count,
+        ]);
     }
 }

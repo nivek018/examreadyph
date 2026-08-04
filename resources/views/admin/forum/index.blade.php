@@ -44,8 +44,12 @@
                         @else
                         <span class="px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 text-[10px] font-bold">Reply</span>
                         <div class="text-sm text-slate-700 dark:text-slate-300 truncate">{{ Str::limit($report->reportable->body, 80) }}</div>
-                        @if($report->reportable->thread)
-                        <div class="text-xs text-slate-400 mt-0.5">in: {{ $report->reportable->thread->title }}</div>
+                        @if($report->reportable->thread && $report->reportable->thread->category)
+                        <div class="text-xs text-slate-400 mt-0.5">
+                            <a href="{{ route('forum.show', [$report->reportable->thread->category, $report->reportable->thread]) }}#reply-{{ $report->reportable->id }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> View in thread: {{ Str::limit($report->reportable->thread->title, 40) }}
+                            </a>
+                        </div>
                         @endif
                         @endif
                         <div class="text-xs text-slate-500 mt-1">by {{ $report->reportable->user->name ?? 'Unknown' }}</div>

@@ -459,20 +459,25 @@
                     'Content-Type': 'application/json'
                 }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = '{{ route("login") }}';
+                    return null;
+                }
+                return res.json();
+            })
             .then(data => {
-                if (data.success) {
-                    const countSpan = btn.querySelector('.upvote-count');
-                    if (countSpan) {
-                        countSpan.innerText = data.upvotes_count;
-                    }
-                    if (data.upvoted) {
-                        btn.classList.add('bg-blue-600', 'text-white');
-                        btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
-                    } else {
-                        btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('bg-slate-100', 'text-slate-700');
-                    }
+                if (!data || !data.success) return;
+                const countSpan = btn.querySelector('.upvote-count');
+                if (countSpan) {
+                    countSpan.innerText = data.upvotes_count;
+                }
+                if (data.upvoted) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-slate-100', 'text-slate-700');
                 }
             })
             .catch(err => console.error('Upvote failed', err));
