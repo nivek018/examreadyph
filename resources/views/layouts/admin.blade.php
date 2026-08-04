@@ -74,6 +74,10 @@
                     <i class="fa-solid fa-users w-5 text-center"></i> Users
                 </a>
 
+                <a href="{{ route('admin.forum.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.forum.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+                    <i class="fa-solid fa-comments w-5 text-center text-orange-400"></i> Forum Moderation
+                </a>
+
                 <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
                     <i class="fa-solid fa-gear w-5 text-center"></i> Settings
                 </a>

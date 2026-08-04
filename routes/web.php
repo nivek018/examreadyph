@@ -23,6 +23,8 @@ use App\Http\Controllers\SubjectPageController;
 use App\Http\Controllers\ExamSetupController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\ForumController;
+use App\Http\Controllers\Admin\ForumModerationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,19 @@ Route::get('/study-guides/{post}', [BlogController::class, 'show'])->name('blog.
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+// Community Forum (public)
+Route::get('/community', [ForumController::class, 'index'])->name('forum.index');
+Route::get('/community/{category}', [ForumController::class, 'category'])->name('forum.category');
+Route::get('/community/{category}/{thread}', [ForumController::class, 'show'])->name('forum.show');
+
+// Community Forum (authenticated)
+Route::middleware(['auth', App\Http\Middleware\ForumSpamGuard::class])->group(function () {
+    Route::get('/community/{category}/new-thread', [ForumController::class, 'createThread'])->name('forum.create');
+    Route::post('/community/{category}/new-thread', [ForumController::class, 'storeThread'])->name('forum.store');
+    Route::post('/community/{category}/{thread}/reply', [ForumController::class, 'storeReply'])->name('forum.reply');
+    Route::post('/community/report/{type}/{id}', [ForumController::class, 'report'])->name('forum.report');
+});
 
 // Ad Tracking AJAX endpoints
 Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
@@ -120,6 +135,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::post('users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggleBan');
     Route::post('users/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('users.makeAdmin');
     Route::post('users/{user}/toggle-subscription', [UserController::class, 'toggleSubscription'])->name('users.toggleSubscription');
+
+    // Forum Moderation
+    Route::get('forum', [ForumModerationController::class, 'index'])->name('forum.index');
+    Route::post('forum/reports/{report}/resolve', [ForumModerationController::class, 'resolve'])->name('forum.resolve');
+    Route::post('forum/reports/{report}/dismiss', [ForumModerationController::class, 'dismiss'])->name('forum.dismiss');
+    Route::post('forum/threads/{thread}/pin', [ForumModerationController::class, 'togglePin'])->name('forum.pin');
+    Route::post('forum/threads/{thread}/lock', [ForumModerationController::class, 'toggleLock'])->name('forum.lock');
+    Route::post('forum/spam/{type}/{id}', [ForumModerationController::class, 'markSpam'])->name('forum.spam');
 
     // Settings
     Route::get('settings', [SettingsController::class, 'index'])->name('settings');

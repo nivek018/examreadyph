@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class ForumReply extends Model
+{
+    protected $fillable = ['thread_id', 'user_id', 'body', 'is_spam', 'parent_id'];
+
+    protected function casts(): array
+    {
+        return ['is_spam' => 'boolean'];
+    }
+
+    public function thread(): BelongsTo
+    {
+        return $this->belongsTo(ForumThread::class, 'thread_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id')->where('is_spam', false);
+    }
+
+    public function scopeVisible($query)
+    {
+        return $query->where('is_spam', false);
+    }
+
+    public function getFormattedDateAttribute(): string
+    {
+        return $this->created_at->diffForHumans();
+    }
+}

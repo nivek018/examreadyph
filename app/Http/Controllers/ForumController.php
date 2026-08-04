@@ -1,0 +1,167 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ForumCategory;
+use App\Models\ForumThread;
+use App\Models\ForumReply;
+use App\Models\ForumReport;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class ForumController extends Controller
+{
+    /**
+     * Forum homepage — list all categories.
+     */
+    public function index()
+    {
+        $categories = ForumCategory::orderBy('sort_order')
+            ->withCount(['visibleThreads as threads_count'])
+            ->get();
+
+        return view('forum.index', compact('categories'));
+    }
+
+    /**
+     * Category view — list threads in a category.
+     */
+    public function category(ForumCategory $category)
+    {
+        $threads = $category->visibleThreads()
+            ->with(['user', 'lastReplyUser'])
+            ->pinnedFirst()
+            ->paginate(20);
+
+        return view('forum.category', compact('category', 'threads'));
+    }
+
+    /**
+     * Thread view — show thread with replies.
+     */
+    public function show(ForumCategory $category, ForumThread $thread)
+    {
+        // Increment view count
+        $thread->increment('views_count');
+
+        $thread->load(['user', 'category']);
+
+        // Get top-level visible replies with their children
+        $replies = $thread->visibleReplies()
+            ->whereNull('parent_id')
+            ->with(['user', 'children.user'])
+            ->oldest()
+            ->paginate(25);
+
+        return view('forum.show', compact('category', 'thread', 'replies'));
+    }
+
+    /**
+     * Show create thread form.
+     */
+    public function createThread(ForumCategory $category)
+    {
+        return view('forum.create', compact('category'));
+    }
+
+    /**
+     * Store a new thread.
+     */
+    public function storeThread(Request $request, ForumCategory $category)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|min:5|max:255',
+            'body' => 'required|string|min:10|max:10000',
+        ]);
+
+        $thread = $category->threads()->create([
+            'user_id' => auth()->id(),
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+        ]);
+
+        // Update category thread count
+        $category->increment('threads_count');
+
+        return redirect()
+            ->route('forum.show', [$category, $thread])
+            ->with('success', 'Thread created successfully!');
+    }
+
+    /**
+     * Store a reply to a thread.
+     */
+    public function storeReply(Request $request, ForumCategory $category, ForumThread $thread)
+    {
+        if ($thread->is_locked) {
+            return back()->with('error', 'This thread is locked and no longer accepting replies.');
+        }
+
+        $validated = $request->validate([
+            'body' => 'required|string|min:2|max:5000',
+            'parent_id' => 'nullable|exists:forum_replies,id',
+        ]);
+
+        // If replying to a nested reply, flatten to 1 level
+        if ($validated['parent_id'] ?? null) {
+            $parent = ForumReply::find($validated['parent_id']);
+            if ($parent && $parent->parent_id) {
+                $validated['parent_id'] = $parent->parent_id;
+            }
+        }
+
+        $reply = $thread->replies()->create([
+            'user_id' => auth()->id(),
+            'body' => $validated['body'],
+            'parent_id' => $validated['parent_id'] ?? null,
+        ]);
+
+        // Update thread metadata
+        $thread->update([
+            'replies_count' => $thread->visibleReplies()->count(),
+            'last_reply_at' => now(),
+            'last_reply_user_id' => auth()->id(),
+        ]);
+
+        // Update category reply count
+        $category->increment('replies_count');
+
+        return back()->with('success', 'Reply posted!');
+    }
+
+    /**
+     * Report a thread or reply.
+     */
+    public function report(Request $request, string $type, int $id)
+    {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:100',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $reportableType = $type === 'thread'
+            ? ForumThread::class
+            : ForumReply::class;
+
+        // Prevent duplicate reports from same user
+        $exists = ForumReport::where('reportable_type', $reportableType)
+            ->where('reportable_id', $id)
+            ->where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'You have already reported this content.');
+        }
+
+        ForumReport::create([
+            'reportable_type' => $reportableType,
+            'reportable_id' => $id,
+            'user_id' => auth()->id(),
+            'reason' => $validated['reason'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        return back()->with('success', 'Report submitted. Our team will review it shortly.');
+    }
+}
