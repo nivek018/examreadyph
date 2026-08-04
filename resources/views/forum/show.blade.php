@@ -192,9 +192,8 @@
                     {{-- Author Profile Card --}}
                     <div class="card flat-card p-5 overflow-hidden relative">
                         <div class="flex items-center gap-3.5 mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-extrabold flex items-center justify-center text-base shadow-md ring-2 ring-blue-500/20 shrink-0">
-                                {{ strtoupper(substr($thread->user->name ?? 'A', 0, 1)) }}
-                            </div>
+                            <img src="{{ optional($thread->user)->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=' . urlencode($thread->user->name ?? 'Author') }}" alt="{{ $thread->user->name ?? 'Author' }}"
+                                class="w-12 h-12 rounded-2xl object-cover bg-white p-0.5 shadow-md border border-slate-200 dark:border-slate-700 shrink-0">
                             <div class="min-w-0 flex-1">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">Topic Starter</span>
                                 <h4 class="font-bold text-slate-900 dark:text-white text-base truncate">{{ $thread->user->name ?? 'Anonymous' }}</h4>
