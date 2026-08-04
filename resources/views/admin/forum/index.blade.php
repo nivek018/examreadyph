@@ -130,7 +130,7 @@
                 <td class="px-5 py-4">
                     <div class="max-w-[300px]">
                         <div class="font-semibold text-slate-900 dark:text-white text-sm truncate">{{ $thread->title }}</div>
-                        <div class="text-xs text-slate-500">by {{ $thread->user->name ?? 'Unknown' }} · {{ $thread->created_at->diffForHumans() }}</div>
+                        <div class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5"><img src="{{ $thread->user->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Unknown' }}" class="w-4 h-4 rounded-full object-cover"> by {{ $thread->user->name ?? 'Unknown' }} · {{ $thread->created_at->diffForHumans() }}</div>
                     </div>
                 </td>
                 <td class="px-5 py-4 text-center text-xs text-slate-600 dark:text-slate-400">{{ $thread->category->name ?? '—' }}</td>

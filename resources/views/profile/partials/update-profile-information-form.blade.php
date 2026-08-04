@@ -19,56 +19,50 @@
 
         {{-- Profile Avatar Picker --}}
         <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <x-input-label value="{{ __('Choose Profile Avatar') }}" class="font-bold text-slate-900 dark:text-white mb-3" />
-
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-5">
-                {{-- Current Avatar Preview --}}
-                <div class="relative group">
+                {{-- Current Active Avatar Preview --}}
+                <div class="relative group shrink-0">
                     <img id="avatar-preview-img" src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
                         class="w-20 h-20 rounded-2xl object-cover bg-white dark:bg-slate-800 p-1 shadow-md border-2 border-blue-500/40">
                     <span class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-bold shadow">Active</span>
                 </div>
 
-                <div class="flex-1 space-y-2">
-                    <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Custom Photo Upload</h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Upload a custom profile photo (PNG, JPG, WEBP, up to 4MB).</p>
-                    <input type="file" id="avatar_file" name="avatar_file" accept="image/*" onchange="previewCustomUpload(this)"
+                <div class="flex-1 space-y-1.5">
+                    <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Upload Custom Image</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Upload your own photo (PNG or JPG only, max 500KB).</p>
+                    <input type="file" id="avatar_file" name="avatar_file" accept=".jpg,.jpeg,.png" onchange="previewCustomUpload(this)"
                         class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
                     <x-input-error class="mt-1" :messages="$errors->get('avatar_file')" />
                 </div>
             </div>
 
-            {{-- DiceBear Avatar Presets Selector --}}
-            <div>
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-robot text-blue-500"></i> Or Pick a DiceBear Avatar Style
+            {{-- DiceBear Avatar Grid Selector (No Text Names, 24 Options + Shuffle) --}}
+            <div class="pt-2 border-t border-slate-200/80 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        Choose Avatar Preset
                     </span>
-                    <button type="button" onclick="randomizeDiceBearAvatars()" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="randomizeDiceBearAvatars()" class="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 cursor-pointer">
                         <i class="fa-solid fa-shuffle text-[10px]"></i> Shuffle Avatars
                     </button>
                 </div>
 
                 @php
-                    $seedBase = urlencode($user->name ?? $user->email ?? 'examinee');
-                    $personaSeeds = ['Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander'];
-                    $dicebearStyles = [];
-                    foreach ($personaSeeds as $seedName) {
-                        $dicebearStyles[] = [
-                            'name' => $seedName,
-                            'url' => "https://api.dicebear.com/7.x/personas/svg?seed={$seedName}"
-                        ];
-                    }
+                    $personaSeeds = [
+                        'Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander',
+                        'Leo', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace', 'Lucas', 'Aria',
+                        'Daniel', 'Evelyn', 'Jack', 'Harper', 'Gabriel', 'Victoria', 'Samuel', 'Zoey'
+                    ];
                 @endphp
 
                 <input type="hidden" id="dicebear_avatar" name="dicebear_avatar" value="">
 
-                <div id="dicebear-presets-grid" class="grid grid-cols-4 sm:grid-cols-8 gap-2.5 pt-2">
-                    @foreach($dicebearStyles as $index => $avatar)
-                    <button type="button" onclick="selectDiceBearAvatar('{{ $avatar['url'] }}', this)"
-                        class="dicebear-preset-btn p-1.5 rounded-xl border transition-all flex flex-col items-center gap-1 cursor-pointer group hover:scale-105 {{ $user->avatar === $avatar['url'] ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400' }}">
-                        <img src="{{ $avatar['url'] }}" alt="{{ $avatar['name'] }}" class="w-10 h-10 rounded-lg object-contain">
-                        <span class="text-[9px] font-semibold text-slate-600 dark:text-slate-400 truncate w-full text-center">{{ $avatar['name'] }}</span>
+                <div id="dicebear-presets-grid" class="grid grid-cols-6 sm:grid-cols-12 gap-2">
+                    @foreach($personaSeeds as $seed)
+                    @php $url = "https://api.dicebear.com/7.x/personas/svg?seed={$seed}"; @endphp
+                    <button type="button" onclick="selectDiceBearAvatar('{{ $url }}', this)"
+                        class="dicebear-preset-btn p-1 rounded-xl border transition-all flex items-center justify-center cursor-pointer hover:scale-110 {{ $user->avatar === $url ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400' }}">
+                        <img src="{{ $url }}" alt="Avatar" class="w-10 h-10 rounded-lg object-contain">
                     </button>
                     @endforeach
                 </div>
@@ -128,27 +122,38 @@
         document.getElementById('avatar_file').value = '';
 
         document.querySelectorAll('.dicebear-preset-btn').forEach(b => {
-            b.className = 'dicebear-preset-btn p-1.5 rounded-xl border transition-all flex flex-col items-center gap-1 cursor-pointer group hover:scale-105 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400';
+            b.className = 'dicebear-preset-btn p-1 rounded-xl border transition-all flex items-center justify-center cursor-pointer hover:scale-110 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400';
         });
 
         if (btn) {
-            btn.className = 'dicebear-preset-btn p-1.5 rounded-xl border-2 border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-sm flex flex-col items-center gap-1 cursor-pointer group hover:scale-105';
+            btn.className = 'dicebear-preset-btn p-1 rounded-xl border-2 border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-sm flex items-center justify-center cursor-pointer hover:scale-110';
         }
     }
 
     function previewCustomUpload(input) {
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 512000) {
+                alert('File size exceeds 500KB. Please select a smaller PNG or JPG image.');
+                input.value = '';
+                return;
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('avatar-preview-img').src = e.target.result;
                 document.getElementById('dicebear_avatar').value = '';
             }
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 
     function randomizeDiceBearAvatars() {
-        const personaSeeds = ['Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander', 'Leo', 'Mia', 'Lucas', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace'];
+        const personaSeeds = [
+            'Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander',
+            'Leo', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace', 'Lucas', 'Aria',
+            'Daniel', 'Evelyn', 'Jack', 'Harper', 'Gabriel', 'Victoria', 'Samuel', 'Zoey',
+            'Adrian', 'Bella', 'Caleb', 'Daisy', 'Eli', 'Fiona', 'Gavin', 'Hazel'
+        ];
         const shuffled = personaSeeds.sort(() => 0.5 - Math.random());
 
         const buttons = document.querySelectorAll('.dicebear-preset-btn');
@@ -156,9 +161,7 @@
             const seedName = shuffled[index % shuffled.length];
             const url = `https://api.dicebear.com/7.x/personas/svg?seed=${seedName}_${Math.floor(Math.random()*100)}`;
             const img = btn.querySelector('img');
-            const label = btn.querySelector('span');
             if (img) img.src = url;
-            if (label) label.innerText = seedName;
             btn.onclick = function() {
                 selectDiceBearAvatar(url, btn);
             };
