@@ -17,25 +17,28 @@
 
         {{-- RIGHT COLUMN: Discussion Main Info --}}
         <div class="flex-1 min-w-0">
-            {{-- Meta Header: Author & Date on FAR LEFT, followed by Category --}}
-            <div class="flex items-center gap-2 flex-wrap text-xs mb-1.5">
-                <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-xs">
-                    <img src="{{ optional($thread->user)->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $thread->user->name ?? 'User' }}" class="w-5 h-5 rounded-full object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700 shadow-xs">
-                    <span>by <strong class="text-slate-900 dark:text-white font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong></span>
-                </span>
-                <span class="text-slate-300 dark:text-slate-700">•</span>
-                <span class="text-slate-500 dark:text-slate-400 text-xs">{{ $thread->created_at->diffForHumans() }}</span>
-                <span class="text-slate-300 dark:text-slate-700">•</span>
+            {{-- Meta Header: Category on Left, Author & Date on FAR RIGHT --}}
+            <div class="flex items-center justify-between gap-2 text-xs mb-1.5 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
+                    @if($thread->is_pinned)
+                    <span class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wide flex items-center gap-1 border border-amber-200 dark:border-amber-800">
+                        <i class="fa-solid fa-thumbtack text-[9px]"></i> Pinned
+                    </span>
+                    @endif
 
-                <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-100 dark:border-blue-900/50">
-                    <i class="{{ $thread->category->icon ?? 'fa-solid fa-folder' }} text-[10px] mr-1"></i> {{ $thread->category->name ?? 'General' }}
-                </span>
+                    <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-100 dark:border-blue-900/50">
+                        <i class="{{ $thread->category->icon ?? 'fa-solid fa-folder' }} text-[10px] mr-1"></i> {{ $thread->category->name ?? 'General' }}
+                    </span>
+                </div>
 
-                @if($thread->is_pinned)
-                <span class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wide flex items-center gap-1 border border-amber-200 dark:border-amber-800">
-                    <i class="fa-solid fa-thumbtack text-[9px]"></i> Pinned
-                </span>
-                @endif
+                <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 sm:ml-auto">
+                    <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+                        <img src="{{ optional($thread->user)->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $thread->user->name ?? 'User' }}" class="w-5 h-5 rounded-full object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700 shadow-xs">
+                        <span>by <strong class="text-slate-900 dark:text-white font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong></span>
+                    </span>
+                    <span class="text-slate-300 dark:text-slate-700">•</span>
+                    <span class="text-slate-500 dark:text-slate-400 text-xs">{{ $thread->created_at->diffForHumans() }}</span>
+                </div>
             </div>
 
             {{-- Title --}}
