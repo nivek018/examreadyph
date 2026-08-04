@@ -50,29 +50,46 @@
             </form>
         </div>
 
-        {{-- Category Pills Bar --}}
-        <div class="flex items-center justify-between gap-4 mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 overflow-x-auto scrollbar-none">
-            <div class="flex items-center gap-2 shrink-0">
-                <a href="{{ route('forum.index', request()->except('category')) }}"
-                    class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
-                    <i class="fa-solid fa-layer-group"></i> All Topics
-                </a>
-                @foreach($categories as $cat)
-                <a href="{{ route('forum.index', array_merge(request()->except('category'), ['category' => $cat->slug])) }}"
-                    class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap {{ request('category') === $cat->slug ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
-                    <i class="{{ $cat->icon }} text-xs"></i> {{ $cat->name }}
-                </a>
-                @endforeach
+        {{-- Category Pills & Filter Ribbon --}}
+        <div class="mb-6 pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+
+            {{-- Scrollable Category Pills with Controls --}}
+            <div class="relative flex-1 min-w-0 flex items-center group">
+                {{-- Left Scroll Arrow --}}
+                <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: -200, behavior: 'smooth'})"
+                    class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 mr-1.5 opacity-80 hover:opacity-100">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+
+                {{-- Scroll Container --}}
+                <div id="cat-ribbon" class="flex items-center gap-2 overflow-x-auto scrollbar-none scroll-smooth py-1 px-0.5 max-w-full">
+                    <a href="{{ route('forum.index', request()->except('category')) }}"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+                        <i class="fa-solid fa-layer-group"></i> All Topics
+                    </a>
+                    @foreach($categories as $cat)
+                    <a href="{{ route('forum.index', array_merge(request()->except('category'), ['category' => $cat->slug])) }}"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 whitespace-nowrap {{ request('category') === $cat->slug ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+                        <i class="{{ $cat->icon }} text-xs"></i> {{ $cat->name }}
+                    </a>
+                    @endforeach
+                </div>
+
+                {{-- Right Scroll Arrow --}}
+                <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: 200, behavior: 'smooth'})"
+                    class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 ml-1.5 opacity-80 hover:opacity-100">
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
             </div>
 
             {{-- Feed Sort Toggles --}}
-            <div class="hidden sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl shrink-0">
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl shrink-0 self-start sm:self-auto">
                 <a href="{{ route('forum.index', array_merge(request()->except('sort'), ['sort' => 'newest'])) }}"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $sort === 'newest' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200' }}">
+                    class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ $sort === 'newest' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200' }}">
                     <i class="fa-solid fa-clock mr-1"></i> Latest
                 </a>
                 <a href="{{ route('forum.index', array_merge(request()->except('sort'), ['sort' => 'trending'])) }}"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $sort === 'trending' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200' }}">
+                    class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ $sort === 'trending' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200' }}">
                     <i class="fa-solid fa-fire mr-1"></i> Popular
                 </a>
             </div>

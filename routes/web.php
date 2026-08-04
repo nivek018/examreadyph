@@ -44,18 +44,20 @@ Route::get('/study-guides/{post}', [BlogController::class, 'show'])->name('blog.
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-// Community Forum (public)
-Route::get('/community', [ForumController::class, 'index'])->name('forum.index');
-Route::get('/community/{category}', [ForumController::class, 'category'])->name('forum.category');
-Route::get('/community/{category}/{thread}', [ForumController::class, 'show'])->name('forum.show');
-
-// Community Forum (authenticated)
+// Community Forum (authenticated action routes - MUST BE BEFORE {thread} wildcard)
 Route::middleware(['auth', App\Http\Middleware\ForumSpamGuard::class])->group(function () {
-    Route::get('/community/{category}/new-thread', [ForumController::class, 'createThread'])->name('forum.create');
-    Route::post('/community/{category}/new-thread', [ForumController::class, 'storeThread'])->name('forum.store');
+    Route::get('/community/new/{category?}', [ForumController::class, 'createThread'])->name('forum.create');
+    Route::post('/community/new/{category?}', [ForumController::class, 'storeThread'])->name('forum.store');
+    Route::get('/community/{category}/new-thread', [ForumController::class, 'createThread']);
+    Route::post('/community/{category}/new-thread', [ForumController::class, 'storeThread']);
     Route::post('/community/{category}/{thread}/reply', [ForumController::class, 'storeReply'])->name('forum.reply');
     Route::post('/community/report/{type}/{id}', [ForumController::class, 'report'])->name('forum.report');
 });
+
+// Community Forum (public viewing)
+Route::get('/community', [ForumController::class, 'index'])->name('forum.index');
+Route::get('/community/{category}', [ForumController::class, 'category'])->name('forum.category');
+Route::get('/community/{category}/{thread}', [ForumController::class, 'show'])->name('forum.show');
 
 // Ad Tracking AJAX endpoints
 Route::post('/ads/{ad}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');

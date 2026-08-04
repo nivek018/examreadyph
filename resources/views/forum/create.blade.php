@@ -19,15 +19,17 @@
 
             <form method="POST" action="{{ route('forum.store', $category) }}" class="card flat-card p-6 sm:p-8 space-y-5">
                 @csrf
+                <input type="hidden" name="category_id" id="selected_category_id" value="{{ $category->id }}">
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Category <span class="text-rose-500">*</span></label>
+                    <label class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Select Category <span class="text-rose-500">*</span></label>
                     <div class="flex flex-wrap gap-2">
                         @foreach($categories as $cat)
-                        <a href="{{ route('forum.create', $cat) }}"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors {{ $category->id === $cat->id ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-blue-300' }}">
+                        <button type="button"
+                            onclick="document.getElementById('selected_category_id').value = {{ $cat->id }}; document.querySelectorAll('.cat-pill').forEach(el => el.classList.remove('bg-blue-600', 'text-white', 'border-blue-600')); this.classList.add('bg-blue-600', 'text-white', 'border-blue-600');"
+                            class="cat-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all shadow-sm {{ $category->id === $cat->id ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-400' }}">
                             <i class="{{ $cat->icon }} text-xs"></i> {{ $cat->name }}
-                        </a>
+                        </button>
                         @endforeach
                     </div>
                 </div>

@@ -94,21 +94,32 @@ class ForumController extends Controller
     /**
      * Show create thread form.
      */
-    public function createThread(ForumCategory $category)
+    public function createThread(?ForumCategory $category = null)
     {
         $categories = ForumCategory::orderBy('sort_order')->get();
+        if (!$category || !$category->exists) {
+            $category = $categories->first();
+        }
+
         return view('forum.create', compact('category', 'categories'));
     }
 
     /**
      * Store a new thread.
      */
-    public function storeThread(Request $request, ForumCategory $category)
+    public function storeThread(Request $request, ?ForumCategory $category = null)
     {
         $validated = $request->validate([
+            'category_id' => 'nullable|exists:forum_categories,id',
             'title' => 'required|string|min:5|max:255',
             'body' => 'required|string|min:10|max:10000',
         ]);
+
+        if (!empty($validated['category_id'])) {
+            $category = ForumCategory::findOrFail($validated['category_id']);
+        } elseif (!$category || !$category->exists) {
+            $category = ForumCategory::orderBy('sort_order')->firstOrFail();
+        }
 
         $thread = $category->threads()->create([
             'user_id' => auth()->id(),
