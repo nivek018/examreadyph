@@ -146,6 +146,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::post('forum/threads/{thread}/pin', [ForumModerationController::class, 'togglePin'])->name('forum.pin');
     Route::post('forum/threads/{thread}/lock', [ForumModerationController::class, 'toggleLock'])->name('forum.lock');
     Route::post('forum/spam/{type}/{id}', [ForumModerationController::class, 'markSpam'])->name('forum.spam');
+    Route::delete('forum/delete/{type}/{id}', [ForumModerationController::class, 'destroy'])->name('forum.destroy');
 
     // Settings
     Route::get('settings', [SettingsController::class, 'index'])->name('settings');

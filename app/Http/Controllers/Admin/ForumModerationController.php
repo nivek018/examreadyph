@@ -126,4 +126,35 @@ class ForumModerationController extends Controller
 
         return back()->with('success', $msg);
     }
+
+    /**
+     * Permanently delete a thread or reply from database.
+     */
+    public function destroy(string $type, int $id)
+    {
+        if ($type === 'thread') {
+            $item = ForumThread::findOrFail($id);
+            $cat = $item->category;
+            $item->delete();
+            if ($cat) {
+                $cat->decrement('threads_count');
+            }
+            $msg = 'Thread permanently deleted from database.';
+        } else {
+            $item = ForumReply::findOrFail($id);
+            $thread = $item->thread;
+            $item->delete();
+            if ($thread) {
+                $thread->update(['replies_count' => $thread->visibleReplies()->count()]);
+            }
+            $msg = 'Reply permanently deleted from database.';
+        }
+
+        // Delete any associated reports
+        ForumReport::where('reportable_type', $type === 'thread' ? ForumThread::class : ForumReply::class)
+            ->where('reportable_id', $id)
+            ->delete();
+
+        return back()->with('success', $msg);
+    }
 }
