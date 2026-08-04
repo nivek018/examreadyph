@@ -624,7 +624,7 @@
                             setTimeout(() => { this.showReportModal = false; }, 2000);
                         }
                     } catch (e) {
-                        alert('Error submitting report.');
+                        this.reportSuccessMsg = 'Unable to submit report. Please try again.';
                     } finally {
                         this.isReporting = false;
                     }

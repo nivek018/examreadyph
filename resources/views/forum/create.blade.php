@@ -53,6 +53,9 @@
                     <input type="text" name="title" id="thread_title" value="{{ old('title') }}" required minlength="5" maxlength="255"
                         placeholder="e.g. Tips for solving Civil Service Math problems fast?"
                         class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <p id="title-error-msg" class="hidden text-rose-500 text-xs mt-1.5 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> Title must be at least 5 characters long.
+                    </p>
                     @error('title') <p class="text-rose-500 text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
 
@@ -64,6 +67,9 @@
                     <textarea name="body" id="thread_body" rows="8" required minlength="10" maxlength="10000"
                         placeholder="Share your question, study insight, or review topic. Be descriptive so fellow examinees can help you effectively."
                         class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">{{ old('body') }}</textarea>
+                    <p id="body-error-msg" class="hidden text-rose-500 text-xs mt-1.5 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> Discussion details must be at least 10 characters long.
+                    </p>
                     @error('body') <p class="text-rose-500 text-xs mt-1.5">{{ $message }}</p> @enderror
                     <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
                         <i class="fa-solid fa-circle-info text-[10px]"></i> Minimum 10 characters. Please follow our community rules.
@@ -72,7 +78,7 @@
 
                 {{-- Submit Buttons --}}
                 <div class="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <button type="button" onclick="openConfirmationModal()" class="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-bold px-7 py-3 rounded-xl transition shadow-md flex items-center gap-2">
+                    <button type="button" onclick="validateAndConfirm()" class="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-bold px-7 py-3 rounded-xl transition shadow-md flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane"></i> Post Discussion
                     </button>
                     <a href="{{ route('forum.index') }}" class="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition px-3 py-2">
@@ -82,6 +88,26 @@
             </form>
         </div>
     </section>
+
+    {{-- Validation Warning Modal --}}
+    <div id="warning-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in duration-200 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2" id="warning-title">
+                Attention Required
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6" id="warning-message">
+                Please complete all required fields.
+            </p>
+
+            <button type="button" onclick="closeWarningModal()" class="w-full bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
+                Got it, let me fix it
+            </button>
+        </div>
+    </div>
 
     {{-- Confirmation Modal --}}
     <div id="confirm-post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
@@ -121,7 +147,7 @@
         </div>
     </div>
 
-    {{-- Interactive Category Selection & Confirmation Scripts --}}
+    {{-- Interactive Scripts --}}
     <script>
         let selectedCatName = @json($category->name);
 
@@ -129,7 +155,6 @@
             document.getElementById('category_id_input').value = id;
             selectedCatName = name;
 
-            // Reset visual active state for all category buttons
             document.querySelectorAll('.cat-pill').forEach(btn => {
                 const isSelected = (btn.getAttribute('data-cat-id') == id);
                 if (isSelected) {
@@ -140,20 +165,45 @@
             });
         }
 
-        function openConfirmationModal() {
-            const form = document.getElementById('post-thread-form');
-            const title = document.getElementById('thread_title').value.trim();
-            const body = document.getElementById('thread_body').value.trim();
+        function validateAndConfirm() {
+            const titleInput = document.getElementById('thread_title');
+            const bodyInput = document.getElementById('thread_body');
+            const titleErr = document.getElementById('title-error-msg');
+            const bodyErr = document.getElementById('body-error-msg');
 
+            const title = titleInput.value.trim();
+            const body = bodyInput.value.trim();
+
+            let isValid = true;
+
+            // Title validation
             if (!title || title.length < 5) {
-                alert('Please enter a discussion title with at least 5 characters.');
-                document.getElementById('thread_title').focus();
-                return;
+                titleInput.classList.add('border-rose-500', 'ring-1', 'ring-rose-500');
+                titleErr.classList.remove('hidden');
+                isValid = false;
+            } else {
+                titleInput.classList.remove('border-rose-500', 'ring-1', 'ring-rose-500');
+                titleErr.classList.add('hidden');
             }
 
+            // Body validation
             if (!body || body.length < 10) {
-                alert('Please enter discussion details with at least 10 characters.');
-                document.getElementById('thread_body').focus();
+                bodyInput.classList.add('border-rose-500', 'ring-1', 'ring-rose-500');
+                bodyErr.classList.remove('hidden');
+                isValid = false;
+            } else {
+                bodyInput.classList.remove('border-rose-500', 'ring-1', 'ring-rose-500');
+                bodyErr.classList.add('hidden');
+            }
+
+            if (!isValid) {
+                if (!title || title.length < 5) {
+                    showWarningModal('Invalid Title', 'Please enter a discussion title with at least 5 characters.');
+                    titleInput.focus();
+                } else if (!body || body.length < 10) {
+                    showWarningModal('Details Too Short', 'Please enter discussion details with at least 10 characters.');
+                    bodyInput.focus();
+                }
                 return;
             }
 
@@ -161,8 +211,18 @@
             document.getElementById('modal-category-preview').innerText = selectedCatName;
             document.getElementById('modal-title-preview').innerText = title;
 
-            // Show modal
+            // Show confirmation modal
             document.getElementById('confirm-post-modal').classList.remove('hidden');
+        }
+
+        function showWarningModal(title, message) {
+            document.getElementById('warning-title').innerText = title;
+            document.getElementById('warning-message').innerText = message;
+            document.getElementById('warning-modal').classList.remove('hidden');
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warning-modal').classList.add('hidden');
         }
 
         function closeConfirmationModal() {
