@@ -6,7 +6,7 @@
 @if($isChild)
 {{-- Child / Sub-Comment Card --}}
 <div class="flex items-start gap-3 group/child relative animate-in fade-in slide-in-from-bottom-2 duration-300" id="reply-{{ $reply->id }}">
-    <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
+    <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
         class="w-7 h-7 rounded-lg object-cover bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shrink-0">
     <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1 flex-wrap">
@@ -53,7 +53,7 @@
 {{-- Top-Level Reply Card --}}
 <div class="card flat-card p-5 sm:p-6 transition-all duration-200 group/reply relative animate-in fade-in slide-in-from-bottom-2 duration-300" id="reply-{{ $reply->id }}">
     <div class="flex items-start gap-3.5">
-        <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
+        <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
             class="w-9 h-9 rounded-xl object-cover bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm">
 
         <div class="flex-1 min-w-0">

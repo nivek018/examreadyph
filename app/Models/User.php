@@ -135,7 +135,7 @@ class User extends Authenticatable
         }
 
         $seed = urlencode($this->name ?? $this->email ?? 'Examinee' . $this->id);
-        return "https://api.dicebear.com/7.x/bottts/svg?seed={$seed}";
+        return "https://api.dicebear.com/7.x/personas/svg?seed={$seed}";
     }
 
     // ─── AI Credit System ────────────────────────────────────────────

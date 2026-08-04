@@ -66,7 +66,7 @@
                             {{-- Author Meta Info --}}
                             <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-200/60 dark:border-slate-800">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $thread->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $thread->user->name }}"
+                                    <img src="{{ $thread->user->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $thread->user->name }}"
                                         class="w-11 h-11 rounded-2xl object-cover bg-white dark:bg-slate-800 p-0.5 shadow-md border border-slate-200 dark:border-slate-700">
                                     <div>
                                         <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">

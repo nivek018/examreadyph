@@ -51,16 +51,14 @@
 
                 @php
                     $seedBase = urlencode($user->name ?? $user->email ?? 'examinee');
-                    $dicebearStyles = [
-                        ['name' => 'Bottts', 'url' => "https://api.dicebear.com/7.x/bottts/svg?seed={$seedBase}"],
-                        ['name' => 'Adventurer', 'url' => "https://api.dicebear.com/7.x/adventurer/svg?seed={$seedBase}"],
-                        ['name' => 'Avataaars', 'url' => "https://api.dicebear.com/7.x/avataaars/svg?seed={$seedBase}"],
-                        ['name' => 'Fun Emoji', 'url' => "https://api.dicebear.com/7.x/fun-emoji/svg?seed={$seedBase}"],
-                        ['name' => 'Notionists', 'url' => "https://api.dicebear.com/7.x/notionists/svg?seed={$seedBase}"],
-                        ['name' => 'Lorelei', 'url' => "https://api.dicebear.com/7.x/lorelei/svg?seed={$seedBase}"],
-                        ['name' => 'Thumbs', 'url' => "https://api.dicebear.com/7.x/thumbs/svg?seed={$seedBase}"],
-                        ['name' => 'Big Smile', 'url' => "https://api.dicebear.com/7.x/big-smile/svg?seed={$seedBase}"],
-                    ];
+                    $personaSeeds = ['Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander'];
+                    $dicebearStyles = [];
+                    foreach ($personaSeeds as $seedName) {
+                        $dicebearStyles[] = [
+                            'name' => $seedName,
+                            'url' => "https://api.dicebear.com/7.x/personas/svg?seed={$seedName}"
+                        ];
+                    }
                 @endphp
 
                 <input type="hidden" id="dicebear_avatar" name="dicebear_avatar" value="">
@@ -150,15 +148,17 @@
     }
 
     function randomizeDiceBearAvatars() {
-        const styles = ['bottts', 'adventurer', 'avataaars', 'fun-emoji', 'notionists', 'lorelei', 'thumbs', 'big-smile'];
-        const randomSeed = Math.random().toString(36).substring(7);
+        const personaSeeds = ['Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander', 'Leo', 'Mia', 'Lucas', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace'];
+        const shuffled = personaSeeds.sort(() => 0.5 - Math.random());
 
         const buttons = document.querySelectorAll('.dicebear-preset-btn');
         buttons.forEach((btn, index) => {
-            const style = styles[index % styles.length];
-            const url = `https://api.dicebear.com/7.x/${style}/svg?seed=${randomSeed}_${index}`;
+            const seedName = shuffled[index % shuffled.length];
+            const url = `https://api.dicebear.com/7.x/personas/svg?seed=${seedName}_${Math.floor(Math.random()*100)}`;
             const img = btn.querySelector('img');
+            const label = btn.querySelector('span');
             if (img) img.src = url;
+            if (label) label.innerText = seedName;
             btn.onclick = function() {
                 selectDiceBearAvatar(url, btn);
             };
