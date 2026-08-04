@@ -12,15 +12,50 @@ use Illuminate\Support\Facades\DB;
 class ForumController extends Controller
 {
     /**
-     * Forum homepage — list all categories.
+     * Forum homepage — flat discussion feed with category filters.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = ForumCategory::orderBy('sort_order')
-            ->withCount(['visibleThreads as threads_count'])
-            ->get();
+        $categories = ForumCategory::orderBy('sort_order')->get();
 
-        return view('forum.index', compact('categories'));
+        $query = ForumThread::visible()
+            ->with(['user', 'lastReplyUser', 'category']);
+
+        // Category filter
+        if ($request->filled('category')) {
+            $cat = ForumCategory::where('slug', $request->category)->first();
+            if ($cat) {
+                $query->where('category_id', $cat->id);
+            }
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('body', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort: newest (default) or trending (most replies in last 7 days)
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'trending') {
+            $query->orderByDesc('replies_count')
+                  ->orderByDesc('views_count');
+        } else {
+            $query->pinnedFirst();
+        }
+
+        $threads = $query->paginate(15)->appends($request->query());
+
+        // Community stats
+        $totalPosts = ForumThread::visible()->count();
+        $weeklyReplies = ForumReply::visible()
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        return view('forum.index', compact('categories', 'threads', 'totalPosts', 'weeklyReplies', 'sort'));
     }
 
     /**
@@ -61,7 +96,8 @@ class ForumController extends Controller
      */
     public function createThread(ForumCategory $category)
     {
-        return view('forum.create', compact('category'));
+        $categories = ForumCategory::orderBy('sort_order')->get();
+        return view('forum.create', compact('category', 'categories'));
     }
 
     /**

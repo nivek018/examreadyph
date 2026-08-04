@@ -145,3 +145,12 @@
                font-bold text-xs border border-emerald-200 dark:border-emerald-800;
     }
 }
+
+/* Hide scrollbars on horizontal-scroll containers */
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
