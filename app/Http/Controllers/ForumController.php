@@ -6,6 +6,7 @@ use App\Models\ForumCategory;
 use App\Models\ForumThread;
 use App\Models\ForumReply;
 use App\Models\ForumReport;
+use App\Models\ForumUpvote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
