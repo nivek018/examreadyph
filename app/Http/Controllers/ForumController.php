@@ -203,21 +203,29 @@ class ForumController extends Controller
             ? ForumThread::class
             : ForumReply::class;
 
-        // Prevent duplicate reports from same user
-        $exists = ForumReport::where('reportable_type', $reportableType)
-            ->where('reportable_id', $id)
-            ->where('user_id', auth()->id())
-            ->where('status', 'pending')
-            ->exists();
+        $userId = auth()->id();
+        $ip = $request->ip();
 
-        if ($exists) {
+        // Prevent duplicate pending reports from same user/IP
+        $existsQuery = ForumReport::where('reportable_type', $reportableType)
+            ->where('reportable_id', $id)
+            ->where('status', 'pending');
+
+        if ($userId) {
+            $existsQuery->where('user_id', $userId);
+        } else {
+            $existsQuery->where('ip_address', $ip);
+        }
+
+        if ($existsQuery->exists()) {
             return back()->with('error', 'You have already reported this content.');
         }
 
         ForumReport::create([
             'reportable_type' => $reportableType,
             'reportable_id' => $id,
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
+            'ip_address' => $ip,
             'reason' => $validated['reason'],
             'description' => $validated['description'] ?? null,
         ]);
@@ -226,35 +234,37 @@ class ForumController extends Controller
     }
 
     /**
-     * Upvote or un-upvote a thread or reply.
+     * Upvote or un-upvote a thread or reply (supports guests via IP).
      */
     public function toggleUpvote(Request $request, string $type, int $id)
     {
-        if (!auth()->check()) {
-            return response()->json([
-                'success' => false,
-                'redirect' => route('login'),
-                'message' => 'Please sign in to upvote.',
-            ], 401);
-        }
-
         $upvotableClass = $type === 'thread'
             ? ForumThread::class
             : ForumReply::class;
 
         $item = $upvotableClass::findOrFail($id);
 
-        $existing = ForumUpvote::where('user_id', auth()->id())
-            ->where('upvotable_type', $upvotableClass)
-            ->where('upvotable_id', $id)
-            ->first();
+        $userId = auth()->id();
+        $ip = $request->ip();
+
+        $query = ForumUpvote::where('upvotable_type', $upvotableClass)
+            ->where('upvotable_id', $id);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->where('ip_address', $ip);
+        }
+
+        $existing = $query->first();
 
         if ($existing) {
             $existing->delete();
             $upvoted = false;
         } else {
             ForumUpvote::create([
-                'user_id' => auth()->id(),
+                'user_id' => $userId,
+                'ip_address' => $ip,
                 'upvotable_type' => $upvotableClass,
                 'upvotable_id' => $id,
             ]);

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ForumUpvote extends Model
 {
-    protected $fillable = ['user_id', 'upvotable_type', 'upvotable_id'];
+    protected $fillable = ['user_id', 'ip_address', 'upvotable_type', 'upvotable_id'];
 
     public function upvotable(): MorphTo
     {

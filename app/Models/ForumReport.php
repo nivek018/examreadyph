@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class ForumReport extends Model
 {
     protected $fillable = [
-        'reportable_type', 'reportable_id', 'user_id',
+        'reportable_type', 'reportable_id', 'user_id', 'ip_address',
         'reason', 'description', 'status',
         'resolved_by', 'resolved_at',
     ];

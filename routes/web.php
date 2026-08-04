@@ -44,18 +44,18 @@ Route::get('/study-guides/{post}', [BlogController::class, 'show'])->name('blog.
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-// Community Forum (authenticated action routes - MUST BE BEFORE {thread} wildcard)
+// Community Forum (authenticated posting routes - MUST BE BEFORE {thread} wildcard)
 Route::middleware(['auth', App\Http\Middleware\ForumSpamGuard::class])->group(function () {
     Route::get('/community/new/{category?}', [ForumController::class, 'createThread'])->name('forum.create');
     Route::post('/community/new/{category?}', [ForumController::class, 'storeThread'])->name('forum.store');
     Route::get('/community/{category}/new-thread', [ForumController::class, 'createThread']);
     Route::post('/community/{category}/new-thread', [ForumController::class, 'storeThread']);
     Route::post('/community/{category}/{thread}/reply', [ForumController::class, 'storeReply'])->name('forum.reply');
-    Route::post('/community/report/{type}/{id}', [ForumController::class, 'report'])->name('forum.report');
-    Route::post('/community/upvote/{type}/{id}', [ForumController::class, 'toggleUpvote'])->name('forum.upvote');
 });
 
-// Community Forum (public viewing)
+// Community Forum (public actions & viewing)
+Route::post('/community/report/{type}/{id}', [ForumController::class, 'report'])->name('forum.report');
+Route::post('/community/upvote/{type}/{id}', [ForumController::class, 'toggleUpvote'])->name('forum.upvote');
 Route::get('/community', [ForumController::class, 'index'])->name('forum.index');
 Route::get('/community/{category}', [ForumController::class, 'category'])->name('forum.category');
 Route::get('/community/{category}/{thread}', [ForumController::class, 'show'])->name('forum.show');

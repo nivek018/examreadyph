@@ -77,11 +77,9 @@
                                 </div>
 
                                 {{-- Report Action --}}
-                                @auth
-                                <button type="button" onclick="document.getElementById('report-thread-modal').classList.remove('hidden')" class="text-xs text-slate-400 hover:text-rose-500 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                                <button type="button" onclick="document.getElementById('report-thread-modal').classList.remove('hidden')" class="text-xs text-slate-400 hover:text-rose-500 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Report Thread">
                                     <i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">Report</span>
                                 </button>
-                                @endauth
                             </div>
                         </div>
 
@@ -94,22 +92,14 @@
                             {{-- Bottom Actions & Upvote Bar --}}
                             <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs text-slate-500">
                                 <div class="flex items-center gap-3">
-                                    {{-- Upvote Button --}}
-                                    @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user()); @endphp
-                                    @auth
+                                    {{-- Upvote Button (Works for everyone including guests) --}}
+                                    @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user(), request()->ip()); @endphp
                                     <button type="button" onclick="toggleUpvote('thread', {{ $thread->id }}, this)"
-                                        class="upvote-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 {{ $isThreadUpvoted ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
+                                        class="upvote-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer {{ $isThreadUpvoted ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
                                         <i class="fa-solid fa-thumbs-up text-xs"></i>
                                         <span>Upvote</span>
                                         <span class="upvote-count px-1.5 py-0.2 rounded-full {{ $isThreadUpvoted ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">{{ $thread->upvotes_count }}</span>
                                     </button>
-                                    @else
-                                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-blue-600 transition">
-                                        <i class="fa-solid fa-thumbs-up text-xs"></i>
-                                        <span>Upvote</span>
-                                        <span class="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{ $thread->upvotes_count }}</span>
-                                    </a>
-                                    @endauth
 
                                     {{-- Share Button --}}
                                     <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95">
@@ -142,9 +132,9 @@
                         @if($replies->isNotEmpty())
                         <div class="space-y-4">
                             @foreach($replies as $reply)
-                            @php $isReplyUpvoted = $reply->isUpvotedBy(auth()->user()); @endphp
-                            {{-- Single Top-Level Reply Card --}}
-                            <div class="card flat-card p-5 sm:p-6 transition-all duration-200" id="reply-{{ $reply->id }}">
+                            @php $isReplyUpvoted = $reply->isUpvotedBy(auth()->user(), request()->ip()); @endphp
+                            {{-- Single Top-Level Reply Card with group/reply for mouse hover actions --}}
+                            <div class="card flat-card p-5 sm:p-6 transition-all duration-200 group/reply relative" id="reply-{{ $reply->id }}">
                                 <div class="flex items-start gap-3.5">
                                     {{-- Avatar --}}
                                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
@@ -163,23 +153,29 @@
                                                 <span class="text-xs text-slate-400">{{ $reply->formatted_date }}</span>
                                             </div>
 
-                                            {{-- Reply, Upvote & Report Actions --}}
+                                            {{-- Reply, Upvote & Hover Report Actions --}}
                                             <div class="flex items-center gap-2">
-                                                @auth
+                                                {{-- Upvote Button --}}
                                                 <button type="button" onclick="toggleUpvote('reply', {{ $reply->id }}, this)"
-                                                    class="upvote-btn text-xs font-bold transition-all flex items-center gap-1 px-2.5 py-1 rounded-lg {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
+                                                    class="upvote-btn text-xs font-bold transition-all flex items-center gap-1 px-2.5 py-1 rounded-lg cursor-pointer {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
                                                     <i class="fa-solid fa-thumbs-up text-[10px]"></i>
                                                     <span class="upvote-count">{{ $reply->upvotes_count }}</span>
                                                 </button>
+
+                                                @auth
                                                 @if(!$thread->is_locked)
                                                 <button type="button" onclick="toggleReplyBox('reply-form-{{ $reply->id }}')" class="text-xs text-blue-600 hover:text-blue-700 font-bold transition flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg">
                                                     <i class="fa-solid fa-reply text-[10px]"></i> Reply
                                                 </button>
                                                 @endif
-                                                <button type="button" onclick="toggleReplyBox('report-reply-{{ $reply->id }}')" class="text-xs text-slate-400 hover:text-rose-500 transition p-1" title="Report reply">
-                                                    <i class="fa-solid fa-flag"></i>
-                                                </button>
                                                 @endauth
+
+                                                {{-- Hover Report Button (Revealed on mouse hover over comment) --}}
+                                                <button type="button" onclick="toggleReplyBox('report-reply-{{ $reply->id }}')"
+                                                    class="text-xs text-slate-400 hover:text-rose-500 transition-all p-1.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-70 sm:opacity-0 group-hover/reply:opacity-100"
+                                                    title="Report this comment">
+                                                    <i class="fa-solid fa-flag text-xs"></i>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -189,11 +185,10 @@
                                         </div>
 
                                         {{-- Inline Report Box --}}
-                                        @auth
                                         <div id="report-reply-{{ $reply->id }}" class="hidden mt-3 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800">
                                             <form method="POST" action="{{ route('forum.report', ['reply', $reply->id]) }}">
                                                 @csrf
-                                                <label class="block text-xs font-bold text-rose-700 dark:text-rose-300 mb-1.5">Report Reply</label>
+                                                <label class="block text-xs font-bold text-rose-700 dark:text-rose-300 mb-1.5">Report Comment</label>
                                                 <div class="flex items-center gap-2">
                                                     <select name="reason" required class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                                                         <option value="">Select reason...</option>
@@ -202,11 +197,10 @@
                                                         <option value="misinformation">Misinformation</option>
                                                         <option value="other">Other</option>
                                                     </select>
-                                                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Submit</button>
+                                                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-xs">Submit Report</button>
                                                 </div>
                                             </form>
                                         </div>
-                                        @endauth
 
                                         {{-- Nested Reply Form --}}
                                         @auth
@@ -230,17 +224,38 @@
                                         @if($reply->children->isNotEmpty())
                                         <div class="mt-4 space-y-3 pl-4 border-l-2 border-blue-200 dark:border-blue-800/60">
                                             @foreach($reply->children as $child)
-                                            <div class="flex items-start gap-3" id="reply-{{ $child->id }}">
+                                            <div class="flex items-start gap-3 group/child relative" id="reply-{{ $child->id }}">
                                                 <div class="w-7 h-7 rounded-lg bg-slate-600 text-white font-bold flex items-center justify-center text-[10px] shrink-0">
                                                     {{ strtoupper(substr($child->user->name ?? 'A', 0, 1)) }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center gap-2 mb-1">
-                                                        <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $child->user->name ?? 'Anonymous' }}</span>
-                                                        <span class="text-[10px] text-slate-400">{{ $child->formatted_date }}</span>
+                                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $child->user->name ?? 'Anonymous' }}</span>
+                                                            <span class="text-[10px] text-slate-400">{{ $child->formatted_date }}</span>
+                                                        </div>
+                                                        {{-- Child Reply Report on Hover --}}
+                                                        <button type="button" onclick="toggleReplyBox('report-reply-{{ $child->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity" title="Report comment">
+                                                            <i class="fa-solid fa-flag text-[10px]"></i>
+                                                        </button>
                                                     </div>
                                                     <div class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                                                         {!! nl2br(e($child->body)) !!}
+                                                    </div>
+                                                    {{-- Inline Report Box for Child --}}
+                                                    <div id="report-reply-{{ $child->id }}" class="hidden mt-2 p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800">
+                                                        <form method="POST" action="{{ route('forum.report', ['reply', $child->id]) }}">
+                                                            @csrf
+                                                            <div class="flex items-center gap-2">
+                                                                <select name="reason" required class="flex-1 text-[11px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+                                                                    <option value="">Reason...</option>
+                                                                    <option value="spam">Spam</option>
+                                                                    <option value="offensive">Offensive</option>
+                                                                    <option value="other">Other</option>
+                                                                </select>
+                                                                <button type="submit" class="bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded">Report</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -302,7 +317,7 @@
 
                 </main>
 
-                {{-- Right Sidebar Column (Redesigned) --}}
+                {{-- Right Sidebar Column --}}
                 <aside class="space-y-6">
 
                     {{-- Author Profile Card --}}
@@ -327,7 +342,7 @@
                         <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                             {{ $category->description ?? 'Explore discussions and study strategies in this category.' }}
                         </p>
-                        <a href="{{ route('forum.index', ['category' => $category->slug]) }}" class="inline-flex items-center justify-center gap-1.5 w-full text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs py-2 px-3 rounded-xl hover:bg-blue-600 hover:text-white transition">
+                        <a href="{{ route('forum.index', ['category' => $category->slug]) }}" class="inline-flex items-center justify-center gap-1.5 w-full text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs py-2 px-3 rounded-lg hover:bg-blue-600 hover:text-white transition">
                             <i class="fa-solid fa-folder-open text-xs"></i> Browse Category Threads
                         </a>
                     </div>
@@ -376,7 +391,6 @@
     </section>
 
     {{-- Report Thread Modal --}}
-    @auth
     <div id="report-thread-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
         <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in duration-200">
             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
@@ -406,7 +420,6 @@
             </form>
         </div>
     </div>
-    @endauth
 
     <script>
         function toggleReplyBox(id) {
@@ -459,25 +472,20 @@
                     'Content-Type': 'application/json'
                 }
             })
-            .then(res => {
-                if (res.status === 401) {
-                    window.location.href = '{{ route("login") }}';
-                    return null;
-                }
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                if (!data || !data.success) return;
-                const countSpan = btn.querySelector('.upvote-count');
-                if (countSpan) {
-                    countSpan.innerText = data.upvotes_count;
-                }
-                if (data.upvoted) {
-                    btn.classList.add('bg-blue-600', 'text-white');
-                    btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
-                } else {
-                    btn.classList.remove('bg-blue-600', 'text-white');
-                    btn.classList.add('bg-slate-100', 'text-slate-700');
+                if (data && data.success) {
+                    const countSpan = btn.querySelector('.upvote-count');
+                    if (countSpan) {
+                        countSpan.innerText = data.upvotes_count;
+                    }
+                    if (data.upvoted) {
+                        btn.classList.add('bg-blue-600', 'text-white');
+                        btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                    } else {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-slate-100', 'text-slate-700');
+                    }
                 }
             })
             .catch(err => console.error('Upvote failed', err));

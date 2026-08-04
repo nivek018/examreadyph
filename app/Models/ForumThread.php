@@ -78,10 +78,15 @@ class ForumThread extends Model
         return $this->morphMany(ForumUpvote::class, 'upvotable');
     }
 
-    public function isUpvotedBy(?User $user): bool
+    public function isUpvotedBy(?User $user, ?string $ipAddress = null): bool
     {
-        if (!$user) return false;
-        return $this->upvotes()->where('user_id', $user->id)->exists();
+        if ($user) {
+            return $this->upvotes()->where('user_id', $user->id)->exists();
+        }
+        if ($ipAddress) {
+            return $this->upvotes()->where('ip_address', $ipAddress)->exists();
+        }
+        return false;
     }
 
     // ── Scopes ────────────────────────────────────────────────
