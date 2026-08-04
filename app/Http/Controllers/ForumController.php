@@ -192,20 +192,20 @@ class ForumController extends Controller
         $category->increment('replies_count');
 
         if ($request->wantsJson()) {
-            $reply->load('user');
+            $reply->load(['user', 'children.user']);
+            $html = view('forum.partials.reply_card', [
+                'reply' => $reply,
+                'thread' => $thread,
+                'category' => $category,
+                'isChild' => (bool)$reply->parent_id,
+            ])->render();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reply posted successfully!',
-                'reply' => [
-                    'id' => $reply->id,
-                    'user_name' => $reply->user->name ?? 'Anonymous',
-                    'user_initial' => strtoupper(substr($reply->user->name ?? 'A', 0, 1)),
-                    'body' => e($reply->body),
-                    'formatted_date' => $reply->formatted_date,
-                    'is_op' => ($reply->user_id ?? 0) === $thread->user_id,
-                    'parent_id' => $reply->parent_id,
-                    'upvotes_count' => 0,
-                ],
+                'html' => $html,
+                'parent_id' => $reply->parent_id,
+                'id' => $reply->id,
             ]);
         }
 
