@@ -76,6 +76,11 @@ class ForumController extends Controller
      */
     public function show(ForumCategory $category, ForumThread $thread)
     {
+        // Enforce spam removal: block public & regular users from viewing spam threads via direct URL
+        if ($thread->is_spam && (!auth()->check() || !auth()->user()->is_admin)) {
+            abort(404);
+        }
+
         // Increment view count
         $thread->increment('views_count');
 

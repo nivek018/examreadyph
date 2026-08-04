@@ -152,12 +152,18 @@
                                 <i class="fa-solid fa-lock"></i>
                             </button>
                         </form>
-                        @if(!$thread->is_spam)
                         <form method="POST" action="{{ route('admin.forum.spam', ['thread', $thread->id]) }}" class="inline">
                             @csrf
-                            <button class="text-xs text-slate-400 hover:text-rose-500 font-medium" title="Mark as spam"><i class="fa-solid fa-ban"></i></button>
+                            @if($thread->is_spam)
+                            <button class="text-xs text-emerald-600 hover:text-emerald-500 font-bold inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded" title="Undo Spam / Restore Thread">
+                                <i class="fa-solid fa-rotate-left"></i> Restore
+                            </button>
+                            @else
+                            <button class="text-xs text-slate-400 hover:text-rose-500 font-medium inline-flex items-center gap-1" title="Mark as Spam">
+                                <i class="fa-solid fa-ban"></i> Spam
+                            </button>
+                            @endif
                         </form>
-                        @endif
                     </div>
                 </td>
             </tr>

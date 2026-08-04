@@ -91,7 +91,7 @@ class ForumModerationController extends Controller
     }
 
     /**
-     * Mark a thread or reply as spam.
+     * Mark or unmark (restore) a thread or reply as spam.
      */
     public function markSpam(string $type, int $id)
     {
@@ -101,18 +101,24 @@ class ForumModerationController extends Controller
             $item = ForumReply::findOrFail($id);
         }
 
-        $item->update(['is_spam' => true]);
+        $newStatus = !$item->is_spam;
+        $item->update(['is_spam' => $newStatus]);
 
-        // Auto-resolve any pending reports on this item
-        ForumReport::where('reportable_type', get_class($item))
-            ->where('reportable_id', $id)
-            ->where('status', 'pending')
-            ->update([
-                'status' => 'resolved',
-                'resolved_by' => auth()->id(),
-                'resolved_at' => now(),
-            ]);
+        if ($newStatus) {
+            // Auto-resolve any pending reports on this item
+            ForumReport::where('reportable_type', get_class($item))
+                ->where('reportable_id', $id)
+                ->where('status', 'pending')
+                ->update([
+                    'status' => 'resolved',
+                    'resolved_by' => auth()->id(),
+                    'resolved_at' => now(),
+                ]);
+            $msg = ucfirst($type) . ' marked as spam and removed from public view.';
+        } else {
+            $msg = ucfirst($type) . ' restored from spam (unmarked).';
+        }
 
-        return back()->with('success', ucfirst($type) . ' marked as spam.');
+        return back()->with('success', $msg);
     }
 }
