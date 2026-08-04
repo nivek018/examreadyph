@@ -10,23 +10,21 @@
         {{ strtoupper(substr($reply->user->name ?? 'A', 0, 1)) }}
     </div>
     <div class="flex-1 min-w-0">
-        <div class="flex items-center justify-between gap-2 mb-1">
-            <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $reply->user->name ?? 'Anonymous' }}</span>
-                <span class="text-[10px] text-slate-400">{{ $reply->formatted_date }}</span>
-            </div>
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $reply->user->name ?? 'Anonymous' }}</span>
+            <span class="text-[10px] text-slate-400">{{ $reply->formatted_date }}</span>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 ml-1">
                 {{-- Sub-comment Upvote Button --}}
                 <button type="button" onclick="toggleUpvote('reply', {{ $reply->id }}, this)"
-                    class="upvote-btn text-[11px] font-bold transition-all flex items-center gap-1 px-2 py-0.5 rounded-lg cursor-pointer {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
+                    class="upvote-btn text-[10px] font-bold transition-all flex items-center gap-1 px-2 py-0.5 rounded-md cursor-pointer {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
                     <i class="fa-solid fa-thumbs-up text-[9px]"></i>
                     <span class="upvote-count">{{ $reply->upvotes_count }}</span>
                 </button>
 
                 {{-- Sub-comment Report Button on Hover --}}
-                <button type="button" onclick="toggleReplyBox('report-reply-{{ $reply->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity p-1 cursor-pointer" title="Report comment">
-                    <i class="fa-solid fa-flag text-[10px]"></i>
+                <button type="button" onclick="toggleReplyBox('report-reply-{{ $reply->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity p-0.5 cursor-pointer" title="Report comment">
+                    <i class="fa-solid fa-flag text-[9px]"></i>
                 </button>
             </div>
         </div>
