@@ -186,6 +186,24 @@ class ForumController extends Controller
         // Update category reply count
         $category->increment('replies_count');
 
+        if ($request->wantsJson()) {
+            $reply->load('user');
+            return response()->json([
+                'success' => true,
+                'message' => 'Reply posted successfully!',
+                'reply' => [
+                    'id' => $reply->id,
+                    'user_name' => $reply->user->name ?? 'Anonymous',
+                    'user_initial' => strtoupper(substr($reply->user->name ?? 'A', 0, 1)),
+                    'body' => e($reply->body),
+                    'formatted_date' => $reply->formatted_date,
+                    'is_op' => ($reply->user_id ?? 0) === $thread->user_id,
+                    'parent_id' => $reply->parent_id,
+                    'upvotes_count' => 0,
+                ],
+            ]);
+        }
+
         return back()->with('success', 'Reply posted!');
     }
 
@@ -218,6 +236,12 @@ class ForumController extends Controller
         }
 
         if ($existsQuery->exists()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already reported this content.',
+                ], 422);
+            }
             return back()->with('error', 'You have already reported this content.');
         }
 
@@ -229,6 +253,13 @@ class ForumController extends Controller
             'reason' => $validated['reason'],
             'description' => $validated['description'] ?? null,
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Report submitted. Our moderation team will review it shortly.',
+            ]);
+        }
 
         return back()->with('success', 'Report submitted. Our team will review it shortly.');
     }

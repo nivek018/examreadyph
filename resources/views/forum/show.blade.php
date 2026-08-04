@@ -2,6 +2,12 @@
     :metaTitle="$thread->title . ' — ' . $category->name . ' | ExamReady PH Community'"
     :metaDescription="Str::limit(strip_tags($thread->body), 160)"
 >
+    {{-- Floating Toast Notification --}}
+    <div id="ajax-toast" class="hidden fixed top-20 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <div id="toast-message" class="text-xs font-semibold"></div>
+    </div>
+
     {{-- Breadcrumb Bar --}}
     <div class="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -77,7 +83,7 @@
                                 </div>
 
                                 {{-- Report Action --}}
-                                <button type="button" onclick="document.getElementById('report-thread-modal').classList.remove('hidden')" class="text-xs text-slate-400 hover:text-rose-500 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Report Thread">
+                                <button type="button" onclick="document.getElementById('report-thread-modal').classList.remove('hidden')" class="text-xs text-slate-400 hover:text-rose-500 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer" title="Report Thread">
                                     <i class="fa-solid fa-flag"></i> <span class="hidden sm:inline">Report</span>
                                 </button>
                             </div>
@@ -92,7 +98,7 @@
                             {{-- Bottom Actions & Upvote Bar --}}
                             <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs text-slate-500">
                                 <div class="flex items-center gap-3">
-                                    {{-- Upvote Button (Works for everyone including guests) --}}
+                                    {{-- Upvote Button --}}
                                     @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user(), request()->ip()); @endphp
                                     <button type="button" onclick="toggleUpvote('thread', {{ $thread->id }}, this)"
                                         class="upvote-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer {{ $isThreadUpvoted ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
@@ -102,12 +108,9 @@
                                     </button>
 
                                     {{-- Share Button --}}
-                                    <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95">
+                                    <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95 cursor-pointer">
                                         <i class="fa-solid fa-share-nodes text-blue-500"></i> Share
                                     </button>
-                                    <span id="copied-toast" class="hidden text-emerald-600 font-bold transition flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                                        <i class="fa-solid fa-circle-check text-xs"></i> Copied!
-                                    </span>
                                 </div>
 
                                 <button type="button" onclick="scrollToComments()" class="text-blue-600 font-bold hover:underline flex items-center gap-1.5 cursor-pointer">
@@ -123,20 +126,19 @@
                             <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                 <i class="fa-solid fa-comments text-blue-500"></i>
                                 <span>Replies & Rationales</span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-extrabold">
+                                <span id="replies-count-badge" class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-extrabold">
                                     {{ $thread->replies_count }}
                                 </span>
                             </h2>
                         </div>
 
-                        @if($replies->isNotEmpty())
-                        <div class="space-y-4">
+                        <div id="replies-list-container" class="space-y-4">
+                            @if($replies->isNotEmpty())
                             @foreach($replies as $reply)
                             @php $isReplyUpvoted = $reply->isUpvotedBy(auth()->user(), request()->ip()); @endphp
-                            {{-- Single Top-Level Reply Card with group/reply for mouse hover actions --}}
+                            {{-- Single Top-Level Reply Card --}}
                             <div class="card flat-card p-5 sm:p-6 transition-all duration-200 group/reply relative" id="reply-{{ $reply->id }}">
                                 <div class="flex items-start gap-3.5">
-                                    {{-- Avatar --}}
                                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
                                         {{ strtoupper(substr($reply->user->name ?? 'A', 0, 1)) }}
                                     </div>
@@ -153,9 +155,7 @@
                                                 <span class="text-xs text-slate-400">{{ $reply->formatted_date }}</span>
                                             </div>
 
-                                            {{-- Reply, Upvote & Hover Report Actions --}}
                                             <div class="flex items-center gap-2">
-                                                {{-- Upvote Button --}}
                                                 <button type="button" onclick="toggleUpvote('reply', {{ $reply->id }}, this)"
                                                     class="upvote-btn text-xs font-bold transition-all flex items-center gap-1 px-2.5 py-1 rounded-lg cursor-pointer {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
                                                     <i class="fa-solid fa-thumbs-up text-[10px]"></i>
@@ -164,29 +164,27 @@
 
                                                 @auth
                                                 @if(!$thread->is_locked)
-                                                <button type="button" onclick="toggleReplyBox('reply-form-{{ $reply->id }}')" class="text-xs text-blue-600 hover:text-blue-700 font-bold transition flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg">
+                                                <button type="button" onclick="toggleReplyBox('reply-form-{{ $reply->id }}')" class="text-xs text-blue-600 hover:text-blue-700 font-bold transition flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg cursor-pointer">
                                                     <i class="fa-solid fa-reply text-[10px]"></i> Reply
                                                 </button>
                                                 @endif
                                                 @endauth
 
-                                                {{-- Hover Report Button (Revealed on mouse hover over comment) --}}
                                                 <button type="button" onclick="toggleReplyBox('report-reply-{{ $reply->id }}')"
-                                                    class="text-xs text-slate-400 hover:text-rose-500 transition-all p-1.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-70 sm:opacity-0 group-hover/reply:opacity-100"
+                                                    class="text-xs text-slate-400 hover:text-rose-500 transition-all p-1.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-70 sm:opacity-0 group-hover/reply:opacity-100 cursor-pointer"
                                                     title="Report this comment">
                                                     <i class="fa-solid fa-flag text-xs"></i>
                                                 </button>
                                             </div>
                                         </div>
 
-                                        {{-- Reply Body --}}
                                         <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed space-y-2">
                                             {!! nl2br(e($reply->body)) !!}
                                         </div>
 
                                         {{-- Inline Report Box --}}
                                         <div id="report-reply-{{ $reply->id }}" class="hidden mt-3 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800">
-                                            <form method="POST" action="{{ route('forum.report', ['reply', $reply->id]) }}">
+                                            <form method="POST" action="{{ route('forum.report', ['reply', $reply->id]) }}" onsubmit="submitReportAjax(event, this, 'reply', {{ $reply->id }})">
                                                 @csrf
                                                 <label class="block text-xs font-bold text-rose-700 dark:text-rose-300 mb-1.5">Report Comment</label>
                                                 <div class="flex items-center gap-2">
@@ -197,7 +195,7 @@
                                                         <option value="misinformation">Misinformation</option>
                                                         <option value="other">Other</option>
                                                     </select>
-                                                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-xs">Submit Report</button>
+                                                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-xs cursor-pointer">Submit Report</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -206,14 +204,14 @@
                                         @auth
                                         @if(!$thread->is_locked)
                                         <div id="reply-form-{{ $reply->id }}" class="hidden mt-3 p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                                            <form method="POST" action="{{ route('forum.reply', [$category, $thread]) }}">
+                                            <form method="POST" action="{{ route('forum.reply', [$category, $thread]) }}" onsubmit="submitReplyAjax(event, this)">
                                                 @csrf
                                                 <input type="hidden" name="parent_id" value="{{ $reply->id }}">
                                                 <label class="block text-xs font-bold text-blue-700 dark:text-blue-300 mb-1.5">Replying to {{ $reply->user->name ?? 'User' }}</label>
                                                 <textarea name="body" rows="2" required placeholder="Write a reply..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white mb-2 focus:ring-2 focus:ring-blue-500"></textarea>
                                                 <div class="flex justify-end gap-2">
                                                     <button type="button" onclick="toggleReplyBox('reply-form-{{ $reply->id }}')" class="text-xs text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
-                                                    <button type="submit" class="bg-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-lg hover:bg-blue-500 transition">Post Reply</button>
+                                                    <button type="submit" class="bg-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-lg hover:bg-blue-500 transition cursor-pointer">Post Reply</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -221,8 +219,7 @@
                                         @endauth
 
                                         {{-- Nested Sub-Replies --}}
-                                        @if($reply->children->isNotEmpty())
-                                        <div class="mt-4 space-y-3 pl-4 border-l-2 border-blue-200 dark:border-blue-800/60">
+                                        <div id="children-container-{{ $reply->id }}" class="mt-4 space-y-3 pl-4 border-l-2 border-blue-200 dark:border-blue-800/60 {{ $reply->children->isEmpty() ? 'hidden' : '' }}">
                                             @foreach($reply->children as $child)
                                             <div class="flex items-start gap-3 group/child relative" id="reply-{{ $child->id }}">
                                                 <div class="w-7 h-7 rounded-lg bg-slate-600 text-white font-bold flex items-center justify-center text-[10px] shrink-0">
@@ -232,17 +229,15 @@
                                                     <div class="flex items-center gap-2 mb-1">
                                                         <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $child->user->name ?? 'Anonymous' }}</span>
                                                         <span class="text-[10px] text-slate-400">{{ $child->formatted_date }}</span>
-                                                        {{-- Child Reply Report on Hover (Inline next to date) --}}
-                                                        <button type="button" onclick="toggleReplyBox('report-reply-{{ $child->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity ml-1" title="Report comment">
+                                                        <button type="button" onclick="toggleReplyBox('report-reply-{{ $child->id }}')" class="text-xs text-slate-400 hover:text-rose-500 opacity-70 sm:opacity-0 group-hover/child:opacity-100 transition-opacity ml-1 cursor-pointer" title="Report comment">
                                                             <i class="fa-solid fa-flag text-[10px]"></i>
                                                         </button>
                                                     </div>
                                                     <div class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                                                         {!! nl2br(e($child->body)) !!}
                                                     </div>
-                                                    {{-- Inline Report Box for Child --}}
                                                     <div id="report-reply-{{ $child->id }}" class="hidden mt-2 p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800">
-                                                        <form method="POST" action="{{ route('forum.report', ['reply', $child->id]) }}">
+                                                        <form method="POST" action="{{ route('forum.report', ['reply', $child->id]) }}" onsubmit="submitReportAjax(event, this, 'reply', {{ $child->id }})">
                                                             @csrf
                                                             <div class="flex items-center gap-2">
                                                                 <select name="reason" required class="flex-1 text-[11px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
@@ -251,7 +246,7 @@
                                                                     <option value="offensive">Offensive</option>
                                                                     <option value="other">Other</option>
                                                                 </select>
-                                                                <button type="submit" class="bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded">Report</button>
+                                                                <button type="submit" class="bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded cursor-pointer">Report</button>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -259,23 +254,22 @@
                                             </div>
                                             @endforeach
                                         </div>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
                             @endforeach
+                            @else
+                            <div class="text-center py-12 card flat-card" id="no-replies-placeholder">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-500 flex items-center justify-center mx-auto mb-3 text-xl">
+                                    <i class="fa-regular fa-comments"></i>
+                                </div>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">No responses yet</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Be the first examinee to reply and start the discussion!</p>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="pt-2">{{ $replies->links() }}</div>
-                        @else
-                        <div class="text-center py-12 card flat-card">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-500 flex items-center justify-center mx-auto mb-3 text-xl">
-                                <i class="fa-regular fa-comments"></i>
-                            </div>
-                            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">No responses yet</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">Be the first examinee to reply and start the discussion!</p>
-                        </div>
-                        @endif
                     </div>
 
                     {{-- Post Reply Box --}}
@@ -285,14 +279,13 @@
                             <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                                 <i class="fa-solid fa-pen-to-square text-blue-500"></i> Leave a Reply
                             </h3>
-                            <form method="POST" action="{{ route('forum.reply', [$category, $thread]) }}">
+                            <form method="POST" action="{{ route('forum.reply', [$category, $thread]) }}" onsubmit="submitReplyAjax(event, this)">
                                 @csrf
                                 <textarea name="body" rows="4" required placeholder="Share your rationale, insights, or thoughts on this topic..."
                                     class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">{{ old('body') }}</textarea>
-                                @error('body') <p class="text-rose-500 text-xs mb-2">{{ $message }}</p> @enderror
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-slate-400">Be respectful and clear in your response.</span>
-                                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2 cursor-pointer">
                                         <i class="fa-solid fa-paper-plane"></i> Post Reply
                                     </button>
                                 </div>
@@ -394,7 +387,7 @@
             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-flag text-rose-500"></i> Report Discussion Thread
             </h3>
-            <form method="POST" action="{{ route('forum.report', ['thread', $thread->id]) }}">
+            <form method="POST" action="{{ route('forum.report', ['thread', $thread->id]) }}" onsubmit="submitReportAjax(event, this, 'thread', {{ $thread->id }})">
                 @csrf
                 <div class="mb-3">
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Reason</label>
@@ -413,13 +406,29 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="document.getElementById('report-thread-modal').classList.add('hidden')" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 transition">Cancel</button>
-                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow">Submit Report</button>
+                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow cursor-pointer">Submit Report</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('ajax-toast');
+            const icon = document.getElementById('toast-icon');
+            const message = document.getElementById('toast-message');
+            if (toast && message) {
+                message.innerText = msg;
+                if (type === 'error') {
+                    icon.className = 'fa-solid fa-circle-exclamation text-rose-400 text-lg';
+                } else {
+                    icon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+                }
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 3500);
+            }
+        }
+
         function toggleReplyBox(id) {
             const el = document.getElementById(id);
             if (el) el.classList.toggle('hidden');
@@ -435,7 +444,7 @@
         function copyThreadUrl() {
             const url = window.location.href;
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(showCopyToast);
+                navigator.clipboard.writeText(url).then(() => showToast('Thread URL copied to clipboard!'));
             } else {
                 const textarea = document.createElement('textarea');
                 textarea.value = url;
@@ -445,19 +454,11 @@
                 textarea.select();
                 try {
                     document.execCommand('copy');
-                    showCopyToast();
+                    showToast('Thread URL copied to clipboard!');
                 } catch (err) {
                     console.error('Copy failed', err);
                 }
                 document.body.removeChild(textarea);
-            }
-        }
-
-        function showCopyToast() {
-            const toast = document.getElementById('copied-toast');
-            if (toast) {
-                toast.classList.remove('hidden');
-                setTimeout(() => toast.classList.add('hidden'), 2500);
             }
         }
 
@@ -487,6 +488,134 @@
                 }
             })
             .catch(err => console.error('Upvote failed', err));
+        }
+
+        function submitReportAjax(e, form, type, id) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (submitBtn) submitBtn.disabled = false;
+
+                // Close modals
+                const modal = document.getElementById('report-thread-modal');
+                if (modal) modal.classList.add('hidden');
+                const inlineBox = document.getElementById(`report-reply-${id}`);
+                if (inlineBox) inlineBox.classList.add('hidden');
+
+                form.reset();
+                showToast(data.message || 'Report submitted.', data.success ? 'success' : 'error');
+            })
+            .catch(err => {
+                if (submitBtn) submitBtn.disabled = false;
+                const modal = document.getElementById('report-thread-modal');
+                if (modal) modal.classList.add('hidden');
+                showToast('Report submitted. Our moderation team will review it shortly.', 'success');
+            });
+        }
+
+        function submitReplyAjax(e, form) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (submitBtn) submitBtn.disabled = false;
+                if (data.success && data.reply) {
+                    form.reset();
+
+                    // Hide forms
+                    if (data.reply.parent_id) {
+                        const replyForm = document.getElementById(`reply-form-${data.reply.parent_id}`);
+                        if (replyForm) replyForm.classList.add('hidden');
+                    }
+
+                    // Remove placeholder if present
+                    const placeholder = document.getElementById('no-replies-placeholder');
+                    if (placeholder) placeholder.remove();
+
+                    // Dynamically build & insert reply card into feed
+                    const r = data.reply;
+                    const newCardHtml = `
+                        <div class="card flat-card p-5 sm:p-6 transition-all duration-200 group/reply relative animate-in fade-in slide-in-from-bottom-2 duration-300" id="reply-${r.id}">
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
+                                    ${r.user_initial}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="font-bold text-slate-900 dark:text-white text-sm">${r.user_name}</span>
+                                            ${r.is_op ? '<span class="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold">OP Author</span>' : ''}
+                                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                                            <span class="text-xs text-slate-400">Just now</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="toggleUpvote('reply', ${r.id}, this)"
+                                                class="upvote-btn text-xs font-bold transition-all flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 cursor-pointer">
+                                                <i class="fa-solid fa-thumbs-up text-[10px]"></i>
+                                                <span class="upvote-count">0</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed space-y-2">
+                                        ${r.body.replace(/\n/g, '<br>')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (r.parent_id) {
+                        const targetContainer = document.getElementById(`children-container-${r.parent_id}`);
+                        if (targetContainer) {
+                            targetContainer.classList.remove('hidden');
+                            targetContainer.insertAdjacentHTML('beforeend', newCardHtml);
+                        }
+                    } else {
+                        const feedContainer = document.getElementById('replies-list-container');
+                        if (feedContainer) {
+                            feedContainer.insertAdjacentHTML('beforeend', newCardHtml);
+                        }
+                    }
+
+                    // Update replies count badge
+                    const badge = document.getElementById('replies-count-badge');
+                    if (badge) {
+                        const currentVal = parseInt(badge.innerText.trim()) || 0;
+                        badge.innerText = currentVal + 1;
+                    }
+
+                    showToast('Reply posted successfully!', 'success');
+                } else {
+                    showToast(data.message || 'Failed to post reply.', 'error');
+                }
+            })
+            .catch(err => {
+                if (submitBtn) submitBtn.disabled = false;
+                showToast('Failed to post reply. Please try again.', 'error');
+            });
         }
     </script>
 </x-public-layout>
