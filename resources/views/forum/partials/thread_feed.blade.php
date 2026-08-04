@@ -2,18 +2,23 @@
 @forelse($threads as $thread)
 <article
     onclick="if(!event.target.closest('button, a, input, select')) { window.location.href='{{ route('forum.show', [$thread->category, $thread]) }}'; }"
-    class="card flat-card p-5 sm:p-6 transition-all duration-200 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500/80 hover:bg-slate-50/50 dark:hover:bg-slate-800/80 rounded-2xl cursor-pointer group relative">
+    class="card flat-card p-4 sm:p-5 transition-all duration-200 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500/80 hover:bg-slate-50/50 dark:hover:bg-slate-800/80 rounded-2xl cursor-pointer group relative">
 
-    <div class="flex items-start gap-4">
-        {{-- Examinee User Avatar --}}
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-extrabold flex items-center justify-center text-sm shrink-0 shadow-sm">
-            {{ strtoupper(substr($thread->user->name ?? 'A', 0, 1)) }}
+    <div class="flex items-start gap-3.5 sm:gap-4">
+        {{-- LEFT COLUMN: Upvote / Like Button (Left Side) --}}
+        @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user(), request()->ip()); @endphp
+        <div class="flex flex-col items-center justify-center shrink-0 pt-0.5">
+            <button type="button" onclick="toggleFeedUpvote({{ $thread->id }}, this); event.stopPropagation();"
+                class="upvote-btn inline-flex flex-col items-center justify-center w-11 h-12 rounded-xl font-bold transition-all shadow-xs cursor-pointer border {{ $isThreadUpvoted ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
+                <i class="fa-solid fa-thumbs-up text-xs"></i>
+                <span class="upvote-count text-xs mt-0.5">{{ $thread->upvotes_count }}</span>
+            </button>
         </div>
 
-        {{-- Discussion Main Info --}}
+        {{-- RIGHT COLUMN: Discussion Main Info --}}
         <div class="flex-1 min-w-0">
             {{-- Meta Badges & Category --}}
-            <div class="flex items-center gap-2 flex-wrap text-xs mb-2">
+            <div class="flex items-center gap-2 flex-wrap text-xs mb-1.5">
                 @if($thread->is_pinned)
                 <span class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wide flex items-center gap-1 border border-amber-200 dark:border-amber-800">
                     <i class="fa-solid fa-thumbtack text-[9px]"></i> Pinned
@@ -28,27 +33,20 @@
             </div>
 
             {{-- Title --}}
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug mb-2">
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug mb-1.5">
                 <a href="{{ route('forum.show', [$thread->category, $thread]) }}" class="hover:underline">
                     {{ $thread->title }}
                 </a>
             </h2>
 
             {{-- Text Excerpt --}}
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4 font-normal">
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-3 font-normal">
                 {{ Str::limit(strip_tags($thread->body), 160) }}
             </p>
 
-            {{-- Footer Info & Action Controls --}}
-            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                <div class="flex items-center gap-3 flex-wrap">
-                    @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user(), request()->ip()); @endphp
-                    <button type="button" onclick="toggleFeedUpvote({{ $thread->id }}, this); event.stopPropagation();"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer {{ $isThreadUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700' }}">
-                        <i class="fa-solid fa-thumbs-up text-[10px]"></i>
-                        <span class="upvote-count">{{ $thread->upvotes_count }}</span>
-                    </button>
-
+            {{-- Footer Info & Counters --}}
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                <div class="flex items-center gap-3">
                     <span class="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300">
                         <i class="fa-regular fa-comment-dots text-blue-500"></i> {{ $thread->replies_count }} {{ Str::plural('Reply', $thread->replies_count) }}
                     </span>

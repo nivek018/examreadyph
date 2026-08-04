@@ -48,9 +48,9 @@
 
                 {{-- Scrollable Category Pills with Controls --}}
                 <div class="relative w-full flex-1 min-w-0 flex items-center group overflow-hidden">
-                    {{-- Left Scroll Arrow --}}
-                    <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: -200, behavior: 'smooth'})"
-                        class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 mr-1.5 opacity-80 hover:opacity-100 cursor-pointer">
+                    {{-- Left Scroll Arrow (Visible on Mobile & Desktop) --}}
+                    <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: -180, behavior: 'smooth'})"
+                        class="flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 mr-1 opacity-90 hover:opacity-100 cursor-pointer" title="Scroll left">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
                     </button>
 
@@ -72,9 +72,9 @@
                         @endforeach
                     </div>
 
-                    {{-- Right Scroll Arrow --}}
-                    <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: 200, behavior: 'smooth'})"
-                        class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 ml-1.5 opacity-80 hover:opacity-100 cursor-pointer">
+                    {{-- Right Scroll Arrow (Visible on Mobile & Desktop) --}}
+                    <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: 180, behavior: 'smooth'})"
+                        class="flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 ml-1 opacity-90 hover:opacity-100 cursor-pointer" title="Scroll right">
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </button>
                 </div>
@@ -240,11 +240,11 @@
                         countSpan.innerText = data.upvotes_count;
                     }
                     if (data.upvoted) {
-                        btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
-                        btn.classList.add('bg-blue-600', 'text-white');
+                        btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'border-slate-200', 'dark:border-slate-700');
+                        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-blue-500/20');
                     } else {
-                        btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+                        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-blue-500/20');
+                        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'border-slate-200', 'dark:border-slate-700');
                     }
                 }
             })
