@@ -27,13 +27,13 @@
                 </div>
             </div>
 
-            {{-- Search Bar --}}
+            {{-- Search Bar (Bright High-Contrast Light Style) --}}
             <form id="forum-search-form" onsubmit="submitSearchFeedAjax(event, this)" class="relative mt-6 max-w-2xl">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm z-10"></i>
                 <input type="search" id="forum-search-input" name="search" value="{{ request('search') }}" placeholder="Search topics, questions, or subjects..."
-                    class="w-full h-11 pl-11 pr-24 rounded-xl border-0 bg-white/10 dark:bg-slate-800/80 backdrop-blur-md text-white placeholder-slate-400 text-sm focus:ring-2 focus:ring-blue-400 focus:bg-white/20 transition">
-                <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
-                    Search
+                    class="w-full h-12 pl-11 pr-28 rounded-xl border-2 border-white/80 bg-white text-slate-900 placeholder-slate-400 text-sm font-medium shadow-lg focus:ring-4 focus:ring-blue-400/40 focus:border-blue-500 focus:outline-none transition">
+                <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 px-5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg shadow-md transition cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-[11px]"></i> Search
                 </button>
             </form>
         </div>
