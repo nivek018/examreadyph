@@ -67,20 +67,18 @@
                 <td class="px-5 py-4 text-center text-xs text-slate-600 dark:text-slate-400">{{ $report->user->name ?? 'Unknown' }}</td>
                 <td class="px-5 py-4 text-center text-xs text-slate-500">{{ $report->created_at->diffForHumans() }}</td>
                 <td class="px-5 py-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                        @if($report->reportable)
-                        <form method="POST" action="{{ route('admin.forum.spam', [$report->reportable_type === \App\Models\ForumThread::class ? 'thread' : 'reply', $report->reportable_id]) }}">
-                            @csrf
-                            <button class="text-xs text-rose-500 hover:text-rose-400 font-medium" title="Mark as spam"><i class="fa-solid fa-ban"></i> Spam</button>
-                        </form>
-                        @endif
+                    <div class="flex items-center justify-end gap-3">
                         <form method="POST" action="{{ route('admin.forum.resolve', $report) }}">
                             @csrf
-                            <button class="text-xs text-emerald-600 hover:text-emerald-500 font-medium"><i class="fa-solid fa-check"></i> Resolve</button>
+                            <button class="text-xs bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-xs flex items-center gap-1.5" title="Approve report and hide content from public view">
+                                <i class="fa-solid fa-ban text-[10px]"></i> Hide Content
+                            </button>
                         </form>
                         <form method="POST" action="{{ route('admin.forum.dismiss', $report) }}">
                             @csrf
-                            <button class="text-xs text-slate-500 hover:text-slate-400 font-medium"><i class="fa-solid fa-xmark"></i> Dismiss</button>
+                            <button class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 font-bold px-3 py-1.5 rounded-lg transition" title="Dismiss report and keep content active">
+                                <i class="fa-solid fa-xmark text-[10px]"></i> Dismiss
+                            </button>
                         </form>
                     </div>
                 </td>
