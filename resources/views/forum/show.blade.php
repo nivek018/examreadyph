@@ -66,9 +66,8 @@
                             {{-- Author Meta Info --}}
                             <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-200/60 dark:border-slate-800">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-extrabold flex items-center justify-center text-sm shadow-md ring-2 ring-blue-500/20">
-                                        {{ strtoupper(substr($thread->user->name ?? 'A', 0, 1)) }}
-                                    </div>
+                                    <img src="{{ $thread->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $thread->user->name }}"
+                                        class="w-11 h-11 rounded-2xl object-cover bg-white dark:bg-slate-800 p-0.5 shadow-md border border-slate-200 dark:border-slate-700">
                                     <div>
                                         <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
                                             <span>{{ $thread->user->name ?? 'Anonymous' }}</span>

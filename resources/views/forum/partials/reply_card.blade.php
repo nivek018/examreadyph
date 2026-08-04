@@ -6,9 +6,8 @@
 @if($isChild)
 {{-- Child / Sub-Comment Card --}}
 <div class="flex items-start gap-3 group/child relative animate-in fade-in slide-in-from-bottom-2 duration-300" id="reply-{{ $reply->id }}">
-    <div class="w-7 h-7 rounded-lg bg-slate-600 text-white font-bold flex items-center justify-center text-[10px] shrink-0">
-        {{ strtoupper(substr($reply->user->name ?? 'A', 0, 1)) }}
-    </div>
+    <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
+        class="w-7 h-7 rounded-lg object-cover bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shrink-0">
     <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1 flex-wrap">
             <span class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $reply->user->name ?? 'Anonymous' }}</span>
@@ -54,9 +53,8 @@
 {{-- Top-Level Reply Card --}}
 <div class="card flat-card p-5 sm:p-6 transition-all duration-200 group/reply relative animate-in fade-in slide-in-from-bottom-2 duration-300" id="reply-{{ $reply->id }}">
     <div class="flex items-start gap-3.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
-            {{ strtoupper(substr($reply->user->name ?? 'A', 0, 1)) }}
-        </div>
+        <img src="{{ $reply->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $reply->user->name ?? 'User' }}"
+            class="w-9 h-9 rounded-xl object-cover bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm">
 
         <div class="flex-1 min-w-0">
             {{-- Header --}}

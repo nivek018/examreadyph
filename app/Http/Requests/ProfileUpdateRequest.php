@@ -26,6 +26,8 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'dicebear_avatar' => ['nullable', 'string', 'url', 'max:500'],
+            'avatar_file' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp,gif,svg', 'max:4096'],
         ];
     }
 }

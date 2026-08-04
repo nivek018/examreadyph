@@ -121,6 +121,23 @@ class User extends Authenticatable
         return $initials;
     }
 
+    /**
+     * Get user's avatar URL.
+     * Defaults to a DiceBear SVG avatar using user name/email as seed.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if (!empty($this->avatar)) {
+            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+                return $this->avatar;
+            }
+            return asset('storage/' . $this->avatar);
+        }
+
+        $seed = urlencode($this->name ?? $this->email ?? 'Examinee' . $this->id);
+        return "https://api.dicebear.com/7.x/bottts/svg?seed={$seed}";
+    }
+
     // ─── AI Credit System ────────────────────────────────────────────
 
     /**

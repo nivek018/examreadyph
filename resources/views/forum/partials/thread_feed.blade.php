@@ -27,7 +27,11 @@
                 <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-100 dark:border-blue-900/50">
                     <i class="{{ $thread->category->icon ?? 'fa-solid fa-folder' }} text-[10px] mr-1"></i> {{ $thread->category->name ?? 'General' }}
                 </span>
-                <span class="text-slate-400 dark:text-slate-500 text-xs">by <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong></span>
+                <span class="inline-flex items-center gap-1.5 text-slate-400 dark:text-slate-500 text-xs">
+                    by
+                    <img src="{{ $thread->user->avatar_url ?? 'https://api.dicebear.com/7.x/bottts/svg?seed=Anonymous' }}" alt="{{ $thread->user->name ?? 'User' }}" class="w-5 h-5 rounded-md object-cover bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700">
+                    <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong>
+                </span>
                 <span class="text-slate-300 dark:text-slate-700">•</span>
                 <span class="text-slate-400 dark:text-slate-500 text-xs">{{ $thread->created_at->diffForHumans() }}</span>
             </div>
