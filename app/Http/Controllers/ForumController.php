@@ -49,6 +49,10 @@ class ForumController extends Controller
 
         $threads = $query->paginate(15)->appends($request->query());
 
+        if ($request->ajax()) {
+            return view('forum.partials.thread_feed', compact('threads'))->render();
+        }
+
         // Community stats
         $totalPosts = ForumThread::visible()->count();
         $weeklyReplies = ForumReply::visible()

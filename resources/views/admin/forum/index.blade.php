@@ -136,7 +136,7 @@
                 <td class="px-5 py-4 text-center text-xs text-slate-600 dark:text-slate-400">{{ $thread->category->name ?? '—' }}</td>
                 <td class="px-5 py-4 text-center">
                     @if($thread->is_spam)
-                    <span class="badge-rose text-[10px]">Spam</span>
+                    <span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-bold">Hidden</span>
                     @else
                     <span class="badge-emerald text-[10px]">Active</span>
                     @endif
