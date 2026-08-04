@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ForumReply extends Model
 {
-    protected $fillable = ['thread_id', 'user_id', 'body', 'is_spam', 'parent_id'];
+    protected $fillable = ['thread_id', 'user_id', 'body', 'is_spam', 'upvotes_count', 'parent_id'];
 
     protected function casts(): array
     {
@@ -33,6 +33,17 @@ class ForumReply extends Model
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->where('is_spam', false);
+    }
+
+    public function upvotes()
+    {
+        return $this->morphMany(ForumUpvote::class, 'upvotable');
+    }
+
+    public function isUpvotedBy(?User $user): bool
+    {
+        if (!$user) return false;
+        return $this->upvotes()->where('user_id', $user->id)->exists();
     }
 
     public function scopeVisible($query)

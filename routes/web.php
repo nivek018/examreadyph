@@ -52,6 +52,7 @@ Route::middleware(['auth', App\Http\Middleware\ForumSpamGuard::class])->group(fu
     Route::post('/community/{category}/new-thread', [ForumController::class, 'storeThread']);
     Route::post('/community/{category}/{thread}/reply', [ForumController::class, 'storeReply'])->name('forum.reply');
     Route::post('/community/report/{type}/{id}', [ForumController::class, 'report'])->name('forum.report');
+    Route::post('/community/upvote/{type}/{id}', [ForumController::class, 'toggleUpvote'])->name('forum.upvote');
 });
 
 // Community Forum (public viewing)

@@ -93,7 +93,15 @@ class ForumController extends Controller
             ->oldest()
             ->paginate(25);
 
-        return view('forum.show', compact('category', 'thread', 'replies'));
+        // Related threads in same category
+        $relatedThreads = ForumThread::visible()
+            ->where('category_id', $category->id)
+            ->where('id', '!=', $thread->id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('forum.show', compact('category', 'thread', 'replies', 'relatedThreads'));
     }
 
     /**
@@ -215,5 +223,51 @@ class ForumController extends Controller
         ]);
 
         return back()->with('success', 'Report submitted. Our team will review it shortly.');
+    }
+
+    /**
+     * Upvote or un-upvote a thread or reply.
+     */
+    public function toggleUpvote(Request $request, string $type, int $id)
+    {
+        $upvotableClass = $type === 'thread'
+            ? ForumThread::class
+            : ForumReply::class;
+
+        $item = $upvotableClass::findOrFail($id);
+
+        $existing = ForumUpvote::where('user_id', auth()->id())
+            ->where('upvotable_type', $upvotableClass)
+            ->where('upvotable_id', $id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            $upvoted = false;
+        } else {
+            ForumUpvote::create([
+                'user_id' => auth()->id(),
+                'upvotable_type' => $upvotableClass,
+                'upvotable_id' => $id,
+            ]);
+            $upvoted = true;
+        }
+
+        // Sync count
+        $count = ForumUpvote::where('upvotable_type', $upvotableClass)
+            ->where('upvotable_id', $id)
+            ->count();
+
+        $item->update(['upvotes_count' => $count]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'upvoted' => $upvoted,
+                'upvotes_count' => $count,
+            ]);
+        }
+
+        return back();
     }
 }

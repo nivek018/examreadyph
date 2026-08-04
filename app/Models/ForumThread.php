@@ -12,7 +12,7 @@ class ForumThread extends Model
     protected $fillable = [
         'category_id', 'user_id', 'title', 'slug', 'body',
         'is_pinned', 'is_locked', 'is_spam',
-        'views_count', 'replies_count',
+        'views_count', 'replies_count', 'upvotes_count',
         'last_reply_at', 'last_reply_user_id',
     ];
 
@@ -71,6 +71,17 @@ class ForumThread extends Model
     public function lastReplyUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'last_reply_user_id');
+    }
+
+    public function upvotes()
+    {
+        return $this->morphMany(ForumUpvote::class, 'upvotable');
+    }
+
+    public function isUpvotedBy(?User $user): bool
+    {
+        if (!$user) return false;
+        return $this->upvotes()->where('user_id', $user->id)->exists();
     }
 
     // ── Scopes ────────────────────────────────────────────────

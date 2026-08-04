@@ -91,16 +91,35 @@
                                 {!! nl2br(e($thread->body)) !!}
                             </div>
 
-                            {{-- Bottom Actions Bar --}}
+                            {{-- Bottom Actions & Upvote Bar --}}
                             <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 text-xs text-slate-500">
                                 <div class="flex items-center gap-3">
+                                    {{-- Upvote Button --}}
+                                    @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user()); @endphp
+                                    @auth
+                                    <button type="button" onclick="toggleUpvote('thread', {{ $thread->id }}, this)"
+                                        class="upvote-btn inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 {{ $isThreadUpvoted ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
+                                        <i class="fa-solid fa-thumbs-up text-xs"></i>
+                                        <span>Upvote</span>
+                                        <span class="upvote-count px-1.5 py-0.2 rounded-full {{ $isThreadUpvoted ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">{{ $thread->upvotes_count }}</span>
+                                    </button>
+                                    @else
+                                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-blue-600 transition">
+                                        <i class="fa-solid fa-thumbs-up text-xs"></i>
+                                        <span>Upvote</span>
+                                        <span class="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{ $thread->upvotes_count }}</span>
+                                    </a>
+                                    @endauth
+
+                                    {{-- Share Button --}}
                                     <button type="button" onclick="copyThreadUrl()" class="hover:text-blue-600 transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95">
-                                        <i class="fa-solid fa-share-nodes text-blue-500"></i> Share Discussion
+                                        <i class="fa-solid fa-share-nodes text-blue-500"></i> Share
                                     </button>
                                     <span id="copied-toast" class="hidden text-emerald-600 font-bold transition flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                                        <i class="fa-solid fa-circle-check text-xs"></i> Link copied!
+                                        <i class="fa-solid fa-circle-check text-xs"></i> Copied!
                                     </span>
                                 </div>
+
                                 <button type="button" onclick="scrollToComments()" class="text-blue-600 font-bold hover:underline flex items-center gap-1.5 cursor-pointer">
                                     <i class="fa-solid fa-arrow-down-long text-xs"></i> Jump to Comments
                                 </button>
@@ -123,6 +142,7 @@
                         @if($replies->isNotEmpty())
                         <div class="space-y-4">
                             @foreach($replies as $reply)
+                            @php $isReplyUpvoted = $reply->isUpvotedBy(auth()->user()); @endphp
                             {{-- Single Top-Level Reply Card --}}
                             <div class="card flat-card p-5 sm:p-6 transition-all duration-200" id="reply-{{ $reply->id }}">
                                 <div class="flex items-start gap-3.5">
@@ -143,9 +163,14 @@
                                                 <span class="text-xs text-slate-400">{{ $reply->formatted_date }}</span>
                                             </div>
 
-                                            {{-- Reply & Report Actions --}}
+                                            {{-- Reply, Upvote & Report Actions --}}
                                             <div class="flex items-center gap-2">
                                                 @auth
+                                                <button type="button" onclick="toggleUpvote('reply', {{ $reply->id }}, this)"
+                                                    class="upvote-btn text-xs font-bold transition-all flex items-center gap-1 px-2.5 py-1 rounded-lg {{ $isReplyUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
+                                                    <i class="fa-solid fa-thumbs-up text-[10px]"></i>
+                                                    <span class="upvote-count">{{ $reply->upvotes_count }}</span>
+                                                </button>
                                                 @if(!$thread->is_locked)
                                                 <button type="button" onclick="toggleReplyBox('reply-form-{{ $reply->id }}')" class="text-xs text-blue-600 hover:text-blue-700 font-bold transition flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg">
                                                     <i class="fa-solid fa-reply text-[10px]"></i> Reply
@@ -277,28 +302,68 @@
 
                 </main>
 
-                {{-- Right Sidebar Column --}}
+                {{-- Right Sidebar Column (Redesigned) --}}
                 <aside class="space-y-6">
+
+                    {{-- Author Profile Card --}}
+                    <div class="card flat-card p-5 overflow-hidden relative">
+                        <div class="flex items-center gap-3.5 mb-3">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-extrabold flex items-center justify-center text-base shadow-md ring-2 ring-blue-500/20 shrink-0">
+                                {{ strtoupper(substr($thread->user->name ?? 'A', 0, 1)) }}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">Topic Starter</span>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-base truncate">{{ $thread->user->name ?? 'Anonymous' }}</h4>
+                                <span class="text-[11px] text-slate-400 block">Member since {{ $thread->user->created_at->format('M Y') ?? '2026' }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     {{-- Category Summary Card --}}
                     <div class="card flat-card p-5">
-                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2 flex items-center gap-2">
                             <i class="{{ $category->icon }} text-blue-500"></i> {{ $category->name }}
                         </h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                             {{ $category->description ?? 'Explore discussions and study strategies in this category.' }}
                         </p>
-                        <a href="{{ route('forum.index', ['category' => $category->slug]) }}" class="inline-block w-full text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs py-2 px-3 rounded-lg hover:bg-blue-600 hover:text-white transition">
-                            View All Threads in {{ $category->name }}
+                        <a href="{{ route('forum.index', ['category' => $category->slug]) }}" class="inline-flex items-center justify-center gap-1.5 w-full text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs py-2 px-3 rounded-xl hover:bg-blue-600 hover:text-white transition">
+                            <i class="fa-solid fa-folder-open text-xs"></i> Browse Category Threads
                         </a>
                     </div>
 
+                    {{-- Related Discussions Widget --}}
+                    @if(isset($relatedThreads) && $relatedThreads->isNotEmpty())
+                    <div class="card flat-card p-5">
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-3.5 flex items-center gap-2">
+                            <i class="fa-solid fa-comments-dollar text-blue-500"></i> Related Topics
+                        </h3>
+                        <div class="space-y-3">
+                            @foreach($relatedThreads as $rel)
+                            <a href="{{ route('forum.show', [$category, $rel]) }}" class="block group">
+                                <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition line-clamp-2 leading-snug mb-1">
+                                    {{ $rel->title }}
+                                </h4>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-400">
+                                    <span><i class="fa-regular fa-comment text-[10px]"></i> {{ $rel->replies_count }}</span>
+                                    <span>•</span>
+                                    <span>{{ $rel->created_at->diffForHumans() }}</span>
+                                </div>
+                            </a>
+                            @if(!$loop->last)
+                            <div class="border-t border-slate-100 dark:border-slate-800/80"></div>
+                            @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Practice Exam Widget --}}
-                    <div class="card flat-card p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+                    <div class="card flat-card p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md">
                         <i class="fa-solid fa-bullseye text-blue-200 text-2xl mb-2 block"></i>
-                        <h3 class="font-bold text-white text-sm mb-1">Test Your Knowledge</h3>
+                        <h3 class="font-bold text-white text-sm mb-1">Test Your Exam Readiness</h3>
                         <p class="text-xs text-blue-100 mb-4 leading-relaxed">
-                            Practice with real exam questions and get instant AI rationales.
+                            Drill practice questions with instant AI explanations for your target exam.
                         </p>
                         <a href="{{ route('reviewers') }}" class="block w-full text-center bg-white text-blue-700 font-bold text-xs py-2.5 px-4 rounded-xl hover:bg-blue-50 transition shadow">
                             Start Practice Drill
@@ -383,6 +448,34 @@
                 toast.classList.remove('hidden');
                 setTimeout(() => toast.classList.add('hidden'), 2500);
             }
+        }
+
+        function toggleUpvote(type, id, btn) {
+            fetch(`/community/upvote/${type}/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const countSpan = btn.querySelector('.upvote-count');
+                    if (countSpan) {
+                        countSpan.innerText = data.upvotes_count;
+                    }
+                    if (data.upvoted) {
+                        btn.classList.add('bg-blue-600', 'text-white');
+                        btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                    } else {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-slate-100', 'text-slate-700');
+                    }
+                }
+            })
+            .catch(err => console.error('Upvote failed', err));
         }
     </script>
 </x-public-layout>

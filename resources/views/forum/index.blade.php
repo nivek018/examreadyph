@@ -147,10 +147,24 @@
                             {{-- Footer Info & Counters --}}
                             <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
                                 <div class="flex items-center gap-4">
+                                    @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user()); @endphp
+                                    @auth
+                                    <button type="button" onclick="toggleFeedUpvote({{ $thread->id }}, this)"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shadow-xs {{ $isThreadUpvoted ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600' }}">
+                                        <i class="fa-solid fa-thumbs-up text-[10px]"></i>
+                                        <span class="upvote-count">{{ $thread->upvotes_count }}</span>
+                                    </button>
+                                    @else
+                                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600">
+                                        <i class="fa-solid fa-thumbs-up text-[10px]"></i>
+                                        <span>{{ $thread->upvotes_count }}</span>
+                                    </a>
+                                    @endauth
+
                                     <span class="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
                                         <i class="fa-regular fa-comment-dots text-blue-500"></i> {{ $thread->replies_count }} {{ Str::plural('Reply', $thread->replies_count) }}
                                     </span>
-                                    <span class="flex items-center gap-1.5">
+                                    <span class="hidden sm:flex items-center gap-1.5">
                                         <i class="fa-regular fa-eye"></i> {{ number_format($thread->views_count) }} views
                                     </span>
                                     @if($thread->is_locked)
@@ -161,7 +175,7 @@
                                 </div>
 
                                 <a href="{{ route('forum.show', [$thread->category, $thread]) }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                    Join Discussion <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                    Open <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                 </a>
                             </div>
                         </div>
@@ -257,4 +271,34 @@
             </aside>
         </div>
     </div>
+
+    <script>
+        function toggleFeedUpvote(id, btn) {
+            fetch(`/community/upvote/thread/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const countSpan = btn.querySelector('.upvote-count');
+                    if (countSpan) {
+                        countSpan.innerText = data.upvotes_count;
+                    }
+                    if (data.upvoted) {
+                        btn.classList.add('bg-blue-600', 'text-white');
+                        btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
+                    } else {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-slate-100', 'text-slate-600');
+                    }
+                }
+            })
+            .catch(err => console.error('Upvote failed', err));
+        }
+    </script>
 </x-public-layout>
