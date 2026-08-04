@@ -134,7 +134,7 @@ class User extends Authenticatable
             return asset('storage/' . $this->avatar);
         }
 
-        $seed = urlencode($this->name ?? $this->email ?? 'Examinee' . $this->id);
+        $seed = md5($this->email ?? $this->name ?? ('Examinee' . $this->id));
         return "https://api.dicebear.com/7.x/personas/svg?seed={$seed}";
     }
 

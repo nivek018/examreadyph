@@ -48,11 +48,10 @@
                 </div>
 
                 @php
-                    $personaSeeds = [
-                        'Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander',
-                        'Leo', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace', 'Lucas', 'Aria',
-                        'Daniel', 'Evelyn', 'Jack', 'Harper', 'Gabriel', 'Victoria', 'Samuel', 'Zoey'
-                    ];
+                    $personaSeeds = [];
+                    for ($i = 1; $i <= 24; $i++) {
+                        $personaSeeds[] = substr(md5('examinee_seed_' . $i), 0, 10);
+                    }
                 @endphp
 
                 <input type="hidden" id="dicebear_avatar" name="dicebear_avatar" value="">
@@ -148,18 +147,10 @@
     }
 
     function randomizeDiceBearAvatars() {
-        const personaSeeds = [
-            'Felix', 'Aneka', 'Amaya', 'Zack', 'Luna', 'Oliver', 'Maya', 'Alexander',
-            'Leo', 'Sofia', 'Ethan', 'Chloe', 'Benjamin', 'Grace', 'Lucas', 'Aria',
-            'Daniel', 'Evelyn', 'Jack', 'Harper', 'Gabriel', 'Victoria', 'Samuel', 'Zoey',
-            'Adrian', 'Bella', 'Caleb', 'Daisy', 'Eli', 'Fiona', 'Gavin', 'Hazel'
-        ];
-        const shuffled = personaSeeds.sort(() => 0.5 - Math.random());
-
         const buttons = document.querySelectorAll('.dicebear-preset-btn');
-        buttons.forEach((btn, index) => {
-            const seedName = shuffled[index % shuffled.length];
-            const url = `https://api.dicebear.com/7.x/personas/svg?seed=${seedName}_${Math.floor(Math.random()*100)}`;
+        buttons.forEach((btn) => {
+            const randomHash = Math.random().toString(36).substring(2, 12);
+            const url = `https://api.dicebear.com/7.x/personas/svg?seed=${randomHash}`;
             const img = btn.querySelector('img');
             if (img) img.src = url;
             btn.onclick = function() {

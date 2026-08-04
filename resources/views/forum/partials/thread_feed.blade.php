@@ -5,35 +5,37 @@
     class="card flat-card p-4 sm:p-5 transition-all duration-200 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500/80 hover:bg-slate-50/50 dark:hover:bg-slate-800/80 rounded-2xl cursor-pointer group relative">
 
     <div class="flex items-start gap-3.5 sm:gap-4">
-        {{-- LEFT COLUMN: Upvote / Like Button (Left Side) --}}
+        {{-- LEFT COLUMN: Frameless Upvote / Like Button (Left Side) --}}
         @php $isThreadUpvoted = $thread->isUpvotedBy(auth()->user(), request()->ip()); @endphp
         <div class="flex flex-col items-center justify-center shrink-0 pt-0.5">
             <button type="button" onclick="toggleFeedUpvote({{ $thread->id }}, this); event.stopPropagation();"
-                class="upvote-btn inline-flex flex-col items-center justify-center w-11 h-12 rounded-xl font-bold transition-all shadow-xs cursor-pointer border {{ $isThreadUpvoted ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600' }}">
-                <i class="fa-solid fa-thumbs-up text-xs"></i>
-                <span class="upvote-count text-xs mt-0.5">{{ $thread->upvotes_count }}</span>
+                class="upvote-btn flex flex-col items-center justify-center transition-colors cursor-pointer group/upvote py-1 px-1.5 rounded-lg {{ $isThreadUpvoted ? 'text-blue-600 dark:text-blue-400 font-extrabold' : 'text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400' }}" title="Upvote discussion">
+                <i class="fa-solid fa-thumbs-up text-base sm:text-lg transition-transform group-hover/upvote:scale-110"></i>
+                <span class="upvote-count text-xs font-bold mt-0.5">{{ $thread->upvotes_count }}</span>
             </button>
         </div>
 
         {{-- RIGHT COLUMN: Discussion Main Info --}}
         <div class="flex-1 min-w-0">
-            {{-- Meta Badges & Category --}}
+            {{-- Meta Header: Author & Date on FAR LEFT, followed by Category --}}
             <div class="flex items-center gap-2 flex-wrap text-xs mb-1.5">
+                <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-xs">
+                    <img src="{{ optional($thread->user)->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $thread->user->name ?? 'User' }}" class="w-5 h-5 rounded-full object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700 shadow-xs">
+                    <span>by <strong class="text-slate-900 dark:text-white font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong></span>
+                </span>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <span class="text-slate-500 dark:text-slate-400 text-xs">{{ $thread->created_at->diffForHumans() }}</span>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+
+                <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-100 dark:border-blue-900/50">
+                    <i class="{{ $thread->category->icon ?? 'fa-solid fa-folder' }} text-[10px] mr-1"></i> {{ $thread->category->name ?? 'General' }}
+                </span>
+
                 @if($thread->is_pinned)
                 <span class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wide flex items-center gap-1 border border-amber-200 dark:border-amber-800">
                     <i class="fa-solid fa-thumbtack text-[9px]"></i> Pinned
                 </span>
                 @endif
-                <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[11px] border border-blue-100 dark:border-blue-900/50">
-                    <i class="{{ $thread->category->icon ?? 'fa-solid fa-folder' }} text-[10px] mr-1"></i> {{ $thread->category->name ?? 'General' }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 text-slate-400 dark:text-slate-500 text-xs">
-                    by
-                    <img src="{{ optional($thread->user)->avatar_url ?? 'https://api.dicebear.com/7.x/personas/svg?seed=Anonymous' }}" alt="{{ $thread->user->name ?? 'User' }}" class="w-5 h-5 rounded-md object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700">
-                    <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ $thread->user->name ?? 'Anonymous' }}</strong>
-                </span>
-                <span class="text-slate-300 dark:text-slate-700">•</span>
-                <span class="text-slate-400 dark:text-slate-500 text-xs">{{ $thread->created_at->diffForHumans() }}</span>
             </div>
 
             {{-- Title --}}
@@ -65,7 +67,7 @@
                 </div>
 
                 <a href="{{ route('forum.show', [$thread->category, $thread]) }}" class="font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1.5 text-xs shrink-0">
-                    Join Discussion <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    Open <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
         </div>
