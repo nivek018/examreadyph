@@ -244,22 +244,16 @@
                     @endif
 
                     {{-- Practice Exam Widget --}}
-                    <div class="card flat-card p-6 bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900 text-white shadow-xl border-0 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-blue-400/20 blur-2xl pointer-events-none"></div>
-                        <div class="relative z-10">
-                            <span class="inline-block px-2.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-[10px] uppercase tracking-wider mb-2.5 border border-amber-300/30">
-                                Practice Drills
-                            </span>
-                            <h3 class="text-xl font-black text-white tracking-tight leading-snug mb-2">
-                                Test Your Exam Readiness
-                            </h3>
-                            <p class="text-xs sm:text-sm text-slate-100/90 leading-relaxed font-medium mb-5">
-                                Take timed practice drills with step-by-step Taglish AI explanations tailored to your target exam.
-                            </p>
-                            <a href="{{ route('reviewers') }}" class="block w-full text-center bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5 active:translate-y-0">
-                                Start Free Practice Drill <i class="fa-solid fa-arrow-right ml-1"></i>
-                            </a>
-                        </div>
+                    <div class="card flat-card p-6 bg-slate-900 text-white border border-slate-800 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-extrabold text-white tracking-tight leading-snug mb-2">
+                            Test Your Exam Readiness
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed font-normal mb-5">
+                            Take timed practice drills with step-by-step Taglish AI explanations tailored to your target exam.
+                        </p>
+                        <a href="{{ route('reviewers') }}" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-4 rounded-xl transition shadow-md active:scale-95">
+                            Start Free Practice Drill
+                        </a>
                     </div>
 
                 </aside>
