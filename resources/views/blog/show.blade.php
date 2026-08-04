@@ -7,16 +7,16 @@
     @push('head')
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Article",
+        "@@context": "https://schema.org",
+        "@@type": "Article",
         "headline": @json($post->title),
         "description": @json($post->meta_description),
         "author": {
-            "@type": "Person",
+            "@@type": "Person",
             "name": @json($post->author->name ?? 'ExamReady PH')
         },
         "publisher": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "ExamReady PH",
             "url": "{{ url('/') }}"
         },
@@ -26,7 +26,7 @@
         "image": "{{ asset('storage/' . $post->featured_image) }}",
         @endif
         "mainEntityOfPage": {
-            "@type": "WebPage",
+            "@@type": "WebPage",
             "@id": "{{ route('blog.show', $post) }}"
         }
     }
