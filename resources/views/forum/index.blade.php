@@ -47,7 +47,7 @@
             <div class="mb-6 pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
 
                 {{-- Scrollable Category Pills with Controls --}}
-                <div class="relative flex-1 min-w-0 flex items-center group">
+                <div class="relative w-full flex-1 min-w-0 flex items-center group overflow-hidden">
                     {{-- Left Scroll Arrow --}}
                     <button type="button" onclick="document.getElementById('cat-ribbon').scrollBy({left: -200, behavior: 'smooth'})"
                         class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition z-20 shrink-0 mr-1.5 opacity-80 hover:opacity-100 cursor-pointer">
@@ -55,11 +55,11 @@
                     </button>
 
                     {{-- Scroll Container with Zero-Refresh Click Handling --}}
-                    <div id="cat-ribbon" class="flex items-center gap-2 overflow-x-auto scrollbar-none scroll-smooth py-1 px-0.5 max-w-full">
+                    <div id="cat-ribbon" class="flex items-center gap-2 overflow-x-auto scrollbar-none touch-pan-x scroll-smooth py-1 px-0.5 w-full">
                         <a href="{{ route('forum.index', request()->except('category')) }}"
                             onclick="loadFeedAjax(this.href, event, this)"
                             data-cat=""
-                            class="cat-pill px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+                            class="cat-pill px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer {{ !request('category') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
                             <i class="fa-solid fa-layer-group"></i> All Topics
                         </a>
                         @foreach($categories as $cat)
